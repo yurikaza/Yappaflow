@@ -24,5 +24,8 @@ export const env = {
     "http://localhost:4000/auth/instagram/callback",
 
   // Frontend URL (for redirects after OAuth)
-  frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
+  frontendUrl: process.env.FRONTEND_URL || "http://localhost:3001",
+
+  // Meta webhook verification token (set in Meta Developer Console)
+  metaWebhookVerifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN || "yappaflow_webhook_verify",
 } as const;
