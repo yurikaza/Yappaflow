@@ -8,6 +8,8 @@ import { env } from "./config/env";
 import { log } from "./utils/logger";
 import { buildAuthContext } from "./middleware/auth";
 import instagramRouter from "./routes/instagram.route";
+import webhooksRouter  from "./routes/webhooks.route";
+import sseRouter       from "./routes/sse.route";
 
 // Accept requests from any localhost port in dev, or the configured frontend URL in prod
 const allowedOrigins = [
@@ -34,7 +36,9 @@ async function main() {
 
   await connectDatabase();
 
-  app.use("/auth", cors(corsOptions), express.json(), instagramRouter);
+  app.use("/auth",    cors(corsOptions), express.json(), instagramRouter);
+  app.use("/webhook", cors(corsOptions), express.json(), webhooksRouter);
+  app.use("/events",  cors(corsOptions), sseRouter);
 
   const apolloServer = createApolloServer();
   await apolloServer.start();

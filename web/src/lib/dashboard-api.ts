@@ -1,0 +1,151 @@
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+function getToken() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("yappaflow_token");
+}
+
+async function gql<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/graphql`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+  const json = await res.json();
+  if (json.errors?.length) throw new Error(json.errors[0].message);
+  return json.data as T;
+}
+
+// ── Types ──────────────────────────────────────────────────────────────────────
+
+export interface Signal {
+  id:            string;
+  platform:      "whatsapp" | "instagram";
+  sender:        string;
+  senderName:    string;
+  preview:       string;
+  isOnDashboard: boolean;
+  status:        "new" | "in_progress" | "converted" | "ignored";
+  createdAt:     string;
+}
+
+export interface Project {
+  id:         string;
+  name:       string;
+  clientName: string;
+  platform:   string;
+  phase:      "listening" | "building" | "deploying" | "live";
+  progress:   number;
+  dueDate:    string | null;
+  liveUrl:    string | null;
+  notes:      string | null;
+  signalId:   string | null;
+  createdAt:  string;
+}
+
+export interface DashboardStats {
+  totalSignals:      number;
+  newSignals:        number;
+  activeProjects:    number;
+  liveProjects:      number;
+  completedThisWeek: number;
+}
+
+// ── Signal queries ─────────────────────────────────────────────────────────────
+
+const SIGNAL_FIELDS = `id platform sender senderName preview isOnDashboard status createdAt`;
+
+export async function getSignals(onDashboardOnly = false) {
+  const data = await gql<{ signals: Signal[] }>(
+    `query Signals($onDashboardOnly: Boolean) {
+      signals(onDashboardOnly: $onDashboardOnly) { ${SIGNAL_FIELDS} }
+    }`,
+    { onDashboardOnly }
+  );
+  return data.signals;
+}
+
+export async function createSignal(input: {
+  platform: string; sender: string; senderName: string; preview: string;
+}) {
+  const data = await gql<{ createSignal: Signal }>(
+    `mutation CreateSignal($input: CreateSignalInput!) {
+      createSignal(input: $input) { ${SIGNAL_FIELDS} }
+    }`,
+    { input }
+  );
+  return data.createSignal;
+}
+
+export async function toggleSignalDashboard(id: string, onDashboard: boolean) {
+  const data = await gql<{ toggleSignalDashboard: Signal }>(
+    `mutation Toggle($id: ID!, $onDashboard: Boolean!) {
+      toggleSignalDashboard(id: $id, onDashboard: $onDashboard) { ${SIGNAL_FIELDS} }
+    }`,
+    { id, onDashboard }
+  );
+  return data.toggleSignalDashboard;
+}
+
+export async function deleteSignal(id: string) {
+  const data = await gql<{ deleteSignal: boolean }>(
+    `mutation DeleteSignal($id: ID!) { deleteSignal(id: $id) }`,
+    { id }
+  );
+  return data.deleteSignal;
+}
+
+// ── Project queries ────────────────────────────────────────────────────────────
+
+const PROJECT_FIELDS = `id name clientName platform phase progress dueDate liveUrl notes signalId createdAt`;
+
+export async function getProjects() {
+  const data = await gql<{ projects: Project[] }>(
+    `query { projects { ${PROJECT_FIELDS} } }`
+  );
+  return data.projects;
+}
+
+export async function createProject(input: {
+  name: string; clientName: string; platform: string; dueDate?: string; notes?: string; signalId?: string;
+}) {
+  const data = await gql<{ createProject: Project }>(
+    `mutation CreateProject($input: CreateProjectInput!) {
+      createProject(input: $input) { ${PROJECT_FIELDS} }
+    }`,
+    { input }
+  );
+  return data.createProject;
+}
+
+export async function updateProject(id: string, input: Partial<{
+  name: string; clientName: string; platform: string; phase: string;
+  progress: number; dueDate: string; liveUrl: string; notes: string;
+}>) {
+  const data = await gql<{ updateProject: Project }>(
+    `mutation UpdateProject($id: ID!, $input: UpdateProjectInput!) {
+      updateProject(id: $id, input: $input) { ${PROJECT_FIELDS} }
+    }`,
+    { id, input }
+  );
+  return data.updateProject;
+}
+
+export async function deleteProject(id: string) {
+  const data = await gql<{ deleteProject: boolean }>(
+    `mutation DeleteProject($id: ID!) { deleteProject(id: $id) }`,
+    { id }
+  );
+  return data.deleteProject;
+}
+
+export async function getDashboardStats() {
+  const data = await gql<{ dashboardStats: DashboardStats }>(
+    `query { dashboardStats { totalSignals newSignals activeProjects liveProjects completedThisWeek } }`
+  );
+  return data.dashboardStats;
+}
