@@ -1,0 +1,207 @@
+/* ============================================
+   YAPPAFLOW PROMO — Hero Section
+   ============================================ */
+
+.yf-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: var(--yf-space-4xl) 0;
+}
+
+/* Subtle grid overlay */
+.yf-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* Radial glow behind hero */
+.yf-hero::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(0, 240, 255, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.yf-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 var(--yf-space-xl);
+}
+
+.yf-hero-badge {
+  margin-bottom: var(--yf-space-xl);
+  animation: yf-slide-up 0.8s var(--yf-ease) both;
+}
+
+.yf-hero-headline {
+  font-size: var(--yf-text-hero);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--yf-space-lg);
+  animation: yf-slide-up 0.8s var(--yf-ease) 0.1s both;
+}
+
+.yf-hero-headline .yf-accent-word {
+  color: var(--yf-accent);
+  position: relative;
+}
+
+.yf-hero-headline .yf-accent-word::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--yf-accent);
+  border-radius: 2px;
+  box-shadow: var(--yf-accent-glow);
+}
+
+.yf-hero-sub {
+  font-size: var(--yf-text-lg);
+  color: var(--yf-text-secondary);
+  max-width: 600px;
+  margin: 0 auto var(--yf-space-2xl);
+  animation: yf-slide-up 0.8s var(--yf-ease) 0.2s both;
+}
+
+/* Voice Wave Canvas */
+.yf-hero-wave-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.6;
+  mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+.yf-hero-wave-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Email Form */
+.yf-hero-form {
+  display: flex;
+  gap: var(--yf-space-sm);
+  max-width: 480px;
+  margin: 0 auto;
+  animation: yf-slide-up 0.8s var(--yf-ease) 0.3s both;
+}
+
+.yf-hero-form .yf-input {
+  flex: 1;
+  padding: var(--yf-space-md) var(--yf-space-lg);
+  background: var(--yf-bg-card);
+  border: 1px solid var(--yf-border);
+  border-radius: var(--yf-border-radius);
+  color: var(--yf-text-primary);
+  font-family: var(--yf-font-body);
+  font-size: var(--yf-text-base);
+  outline: none;
+  transition: border-color var(--yf-duration-fast) ease, box-shadow var(--yf-duration-fast) ease;
+}
+
+.yf-hero-form .yf-input::placeholder {
+  color: var(--yf-text-muted);
+}
+
+.yf-hero-form .yf-input:focus {
+  border-color: var(--yf-accent);
+  box-shadow: 0 0 0 3px var(--yf-accent-dim);
+}
+
+.yf-btn-primary {
+  padding: var(--yf-space-md) var(--yf-space-xl);
+  background: var(--yf-accent);
+  color: var(--yf-bg-primary);
+  font-family: var(--yf-font-display);
+  font-weight: 600;
+  font-size: var(--yf-text-base);
+  border: none;
+  border-radius: var(--yf-border-radius);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--yf-duration-fast) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.yf-btn-primary:hover {
+  background: var(--yf-accent-hover);
+  box-shadow: var(--yf-accent-glow);
+  transform: translateY(-1px);
+}
+
+.yf-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Form success state */
+.yf-form-success {
+  display: none;
+  align-items: center;
+  gap: var(--yf-space-sm);
+  color: var(--yf-accent);
+  font-family: var(--yf-font-mono);
+  font-size: var(--yf-text-sm);
+  animation: yf-fade-in 0.4s ease;
+}
+
+.yf-form-success.yf-show {
+  display: flex;
+}
+
+/* Trusted by strip */
+.yf-hero-trust {
+  margin-top: var(--yf-space-3xl);
+  animation: yf-slide-up 0.8s var(--yf-ease) 0.4s both;
+}
+
+.yf-hero-trust-label {
+  font-size: var(--yf-text-xs);
+  color: var(--yf-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: var(--yf-space-md);
+}
+
+.yf-hero-trust-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--yf-space-2xl);
+  opacity: 0.4;
+}
+
+.yf-hero-trust-logos svg {
+  height: 20px;
+  width: auto;
+  fill: var(--yf-text-primary);
+}

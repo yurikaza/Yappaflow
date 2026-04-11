@@ -1,0 +1,64 @@
+/* ============================================
+   YAPPAFLOW PROMO — Design Tokens
+   All variables prefixed --yf- to avoid
+   Squarespace namespace collisions.
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ---- Colors ---- */
+  --yf-bg-primary: #0A0A0A;
+  --yf-bg-card: #111111;
+  --yf-bg-card-hover: #161616;
+  --yf-bg-elevated: #1A1A1A;
+  --yf-border: #222222;
+  --yf-border-hover: #333333;
+
+  --yf-text-primary: #FFFFFF;
+  --yf-text-secondary: rgba(255, 255, 255, 0.7);
+  --yf-text-muted: rgba(255, 255, 255, 0.4);
+
+  --yf-accent: #00F0FF;
+  --yf-accent-hover: #00D4E0;
+  --yf-accent-dim: rgba(0, 240, 255, 0.15);
+  --yf-accent-glow: 0 0 20px rgba(0, 240, 255, 0.3);
+  --yf-accent-glow-strong: 0 0 40px rgba(0, 240, 255, 0.4), 0 0 80px rgba(0, 240, 255, 0.15);
+
+  /* ---- Typography ---- */
+  --yf-font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --yf-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --yf-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --yf-text-xs: 0.75rem;
+  --yf-text-sm: 0.875rem;
+  --yf-text-base: 1rem;
+  --yf-text-lg: 1.125rem;
+  --yf-text-xl: 1.25rem;
+  --yf-text-2xl: 1.5rem;
+  --yf-text-3xl: 2rem;
+  --yf-text-4xl: 2.5rem;
+  --yf-text-5xl: clamp(2.5rem, 5vw, 4rem);
+  --yf-text-hero: clamp(3rem, 8vw, 7rem);
+
+  /* ---- Spacing ---- */
+  --yf-space-xs: 0.25rem;
+  --yf-space-sm: 0.5rem;
+  --yf-space-md: 1rem;
+  --yf-space-lg: 1.5rem;
+  --yf-space-xl: 2rem;
+  --yf-space-2xl: 3rem;
+  --yf-space-3xl: 4rem;
+  --yf-space-4xl: 6rem;
+  --yf-space-section: clamp(4rem, 10vh, 8rem);
+
+  /* ---- Layout ---- */
+  --yf-max-width: 1280px;
+  --yf-border-radius: 8px;
+  --yf-border-radius-lg: 16px;
+
+  /* ---- Transitions ---- */
+  --yf-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --yf-duration: 0.6s;
+  --yf-duration-fast: 0.3s;
+}

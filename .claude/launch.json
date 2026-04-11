@@ -7,6 +7,12 @@
       "runtimeArgs": [".claude/start-web.sh"],
       "port": 3000,
       "autoPort": false
+    },
+    {
+      "name": "promo",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["live-server", "promo", "--port=5500", "--entry-file=preview.html", "--no-browser"],
+      "port": 5500
     }
   ]
 }

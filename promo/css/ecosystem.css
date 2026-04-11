@@ -1,0 +1,148 @@
+/* ============================================
+   YAPPAFLOW PROMO — Ecosystem Bento Grid
+   ============================================ */
+
+.yf-ecosystem {
+  border-bottom: 1px solid var(--yf-border);
+}
+
+.yf-ecosystem-header {
+  text-align: center;
+  margin-bottom: var(--yf-space-3xl);
+}
+
+.yf-ecosystem-header h2 {
+  font-size: var(--yf-text-5xl);
+  margin-bottom: var(--yf-space-md);
+}
+
+.yf-ecosystem-header p {
+  font-size: var(--yf-text-lg);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Bento Grid */
+.yf-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto auto;
+  gap: 1px;
+  background: var(--yf-border);
+  border: 1px solid var(--yf-border);
+  border-radius: var(--yf-border-radius-lg);
+  overflow: hidden;
+}
+
+/* Asymmetric layout */
+.yf-bento-card:nth-child(1) { grid-column: span 2; }
+.yf-bento-card:nth-child(4) { grid-column: span 2; }
+
+.yf-bento-card {
+  background: var(--yf-bg-card);
+  padding: var(--yf-space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--yf-space-md);
+  transition:
+    background var(--yf-duration-fast) ease,
+    border-color var(--yf-duration-fast) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.yf-bento-card:hover {
+  background: var(--yf-bg-card-hover);
+}
+
+/* Subtle hover glow */
+.yf-bento-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--yf-accent), transparent);
+  opacity: 0;
+  transition: opacity var(--yf-duration-fast) ease;
+}
+
+.yf-bento-card:hover::before {
+  opacity: 0.5;
+}
+
+.yf-bento-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--yf-bg-elevated);
+  border: 1px solid var(--yf-border);
+  border-radius: var(--yf-border-radius);
+  transition: border-color var(--yf-duration-fast) ease, box-shadow var(--yf-duration-fast) ease;
+}
+
+.yf-bento-card:hover .yf-bento-icon {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: var(--yf-accent-glow);
+}
+
+.yf-bento-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--yf-text-secondary);
+  stroke-width: 1.5;
+  transition: stroke var(--yf-duration-fast) ease;
+}
+
+.yf-bento-card:hover .yf-bento-icon svg {
+  stroke: var(--yf-accent);
+}
+
+.yf-bento-name {
+  font-family: var(--yf-font-display);
+  font-size: var(--yf-text-xl);
+  font-weight: 600;
+  color: var(--yf-text-primary);
+}
+
+.yf-bento-desc {
+  font-size: var(--yf-text-sm);
+  color: var(--yf-text-muted);
+  line-height: 1.6;
+}
+
+.yf-bento-tag {
+  display: inline-block;
+  font-family: var(--yf-font-mono);
+  font-size: var(--yf-text-xs);
+  color: var(--yf-accent);
+  background: var(--yf-accent-dim);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: auto;
+  width: fit-content;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .yf-bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .yf-bento-card:nth-child(1) { grid-column: span 2; }
+  .yf-bento-card:nth-child(4) { grid-column: span 1; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .yf-bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .yf-bento-card:nth-child(1),
+  .yf-bento-card:nth-child(4) {
+    grid-column: span 1;
+  }
+}

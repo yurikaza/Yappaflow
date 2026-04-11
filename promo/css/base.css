@@ -1,0 +1,126 @@
+/* ============================================
+   YAPPAFLOW PROMO — Base & Squarespace Overrides
+   ============================================ */
+
+/* --- Reset --- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* --- Squarespace Overrides --- */
+body .yf-promo-wrapper,
+.yf-promo-wrapper {
+  background: var(--yf-bg-primary) !important;
+  color: var(--yf-text-primary) !important;
+  font-family: var(--yf-font-body) !important;
+  font-size: var(--yf-text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Override Squarespace section wrappers */
+.yf-promo-wrapper .sqs-block,
+.yf-promo-wrapper .sqs-block-content {
+  padding: 0 !important;
+  max-width: none !important;
+}
+
+/* --- Custom Scrollbar --- */
+.yf-promo-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.yf-promo-wrapper::-webkit-scrollbar-track {
+  background: var(--yf-bg-primary);
+}
+.yf-promo-wrapper::-webkit-scrollbar-thumb {
+  background: var(--yf-border);
+  border-radius: 3px;
+}
+.yf-promo-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--yf-border-hover);
+}
+
+/* --- Base Typography --- */
+.yf-promo-wrapper h1,
+.yf-promo-wrapper h2,
+.yf-promo-wrapper h3,
+.yf-promo-wrapper h4 {
+  font-family: var(--yf-font-display) !important;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--yf-text-primary);
+}
+
+.yf-promo-wrapper p {
+  color: var(--yf-text-secondary);
+  line-height: 1.7;
+}
+
+.yf-promo-wrapper a {
+  color: var(--yf-accent);
+  text-decoration: none;
+  transition: color var(--yf-duration-fast) ease;
+}
+.yf-promo-wrapper a:hover {
+  color: var(--yf-accent-hover);
+}
+
+/* --- Utility Classes --- */
+.yf-container {
+  width: 100%;
+  max-width: var(--yf-max-width);
+  margin: 0 auto;
+  padding: 0 var(--yf-space-xl);
+}
+
+.yf-section {
+  padding: var(--yf-space-section) 0;
+  position: relative;
+}
+
+.yf-mono {
+  font-family: var(--yf-font-mono);
+}
+
+.yf-accent {
+  color: var(--yf-accent);
+}
+
+.yf-muted {
+  color: var(--yf-text-muted);
+}
+
+.yf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--yf-space-sm);
+  padding: var(--yf-space-xs) var(--yf-space-md);
+  background: var(--yf-accent-dim);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 100px;
+  font-family: var(--yf-font-mono);
+  font-size: var(--yf-text-xs);
+  color: var(--yf-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.yf-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--yf-accent);
+  border-radius: 50%;
+  animation: yf-pulse-dot 2s ease-in-out infinite;
+}
+
+/* --- Selection --- */
+.yf-promo-wrapper ::selection {
+  background: rgba(0, 240, 255, 0.3);
+  color: var(--yf-text-primary);
+}

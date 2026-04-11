@@ -1,0 +1,80 @@
+/* ============================================
+   YAPPAFLOW PROMO — Responsive Overrides
+   ============================================ */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  :root {
+    --yf-space-section: clamp(3rem, 8vh, 6rem);
+  }
+
+  .yf-container {
+    padding: 0 var(--yf-space-lg);
+  }
+
+  .yf-hero-content {
+    max-width: 700px;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  :root {
+    --yf-space-section: 3rem;
+  }
+
+  .yf-container {
+    padding: 0 var(--yf-space-md);
+  }
+
+  .yf-hero {
+    min-height: auto;
+    padding: 6rem 0 4rem;
+  }
+
+  .yf-hero-headline {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  .yf-hero-sub {
+    font-size: var(--yf-text-base);
+  }
+
+  .yf-hero-form {
+    flex-direction: column;
+  }
+
+  .yf-hero-form .yf-btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .yf-hero-trust-logos {
+    gap: var(--yf-space-lg);
+    flex-wrap: wrap;
+  }
+
+  .yf-showcase-header h2,
+  .yf-ecosystem-header h2 {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .yf-footer-headline {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+}
+
+/* Small Mobile (< 480px) */
+@media (max-width: 480px) {
+  .yf-hero-wave-container {
+    height: 120px;
+  }
+
+  .yf-bento-card {
+    padding: var(--yf-space-lg);
+  }
+
+  .yf-showcase-panel {
+    padding: var(--yf-space-lg);
+  }
+}

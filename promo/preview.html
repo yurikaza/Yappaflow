@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Yappaflow — AI-powered web agency. From conversation to code, automatically.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Yappaflow — Stop Coding. Start Talking.">
+  <meta property="og:description" content="AI listens to your client conversations, generates production-ready code, and deploys autonomously.">
+  <meta property="og:type" content="website">
+
+  <title>Yappaflow — Stop Coding. Start Talking.</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230A0A0A'/><text x='6' y='24' font-size='22' fill='%2300F0FF'>Y</text></svg>">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/hero.css">
+  <link rel="stylesheet" href="css/showcase.css">
+  <link rel="stylesheet" href="css/ecosystem.css">
+  <link rel="stylesheet" href="css/footer-cta.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    /* Preview-only: simulate Squarespace body */
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0A0A0A;
+    }
+  </style>
+</head>
+<body>
+
+<div class="yf-promo-wrapper">
+
+  <!-- ========== HERO ========== -->
+  <section class="yf-hero yf-section" id="yf-hero">
+    <div class="yf-hero-content">
+      <div class="yf-hero-badge">
+        <span class="yf-badge">AI-Powered Web Agency</span>
+      </div>
+
+      <h1 class="yf-hero-headline">
+        Stop Coding.<br>
+        Start <span class="yf-accent-word">Talking.</span>
+      </h1>
+
+      <p class="yf-hero-sub">
+        Yappaflow listens to your client conversations, generates production-ready
+        code in real-time, and deploys autonomously. The entire agency pipeline &mdash; automated by AI.
+      </p>
+
+      <form class="yf-hero-form yf-waitlist-form" autocomplete="off">
+        <input type="email" class="yf-input" placeholder="Enter your agency email" required aria-label="Email address">
+        <button type="submit" class="yf-btn-primary">Join Waitlist</button>
+      </form>
+
+      <div class="yf-form-success">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#00F0FF" stroke-width="1.5"/>
+          <path d="M5 8l2 2 4-4" stroke="#00F0FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>You're on the list. We'll be in touch.</span>
+      </div>
+
+      <div class="yf-hero-trust">
+        <p class="yf-hero-trust-label">Trusted by agencies deploying to</p>
+        <div class="yf-hero-trust-logos">
+          <svg viewBox="0 0 60 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="600" fill="white">Shopify</text></svg>
+          <svg viewBox="0 0 65 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="600" fill="white">Webflow</text></svg>
+          <svg viewBox="0 0 85 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="600" fill="white">WordPress</text></svg>
+          <svg viewBox="0 0 85 20" xmlns="http://www.w3.org/2000/svg"><text x="0" y="15" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="600" fill="white">Namecheap</text></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="yf-hero-wave-container">
+      <canvas class="yf-hero-wave-canvas"></canvas>
+    </div>
+  </section>
+
+  <!-- ========== SHOWCASE ========== -->
+  <section class="yf-showcase yf-section" id="yf-showcase">
+    <div class="yf-container">
+      <div class="yf-showcase-header yf-animate">
+        <span class="yf-badge" style="margin-bottom: 1rem; display: inline-flex;">How It Works</span>
+        <h2>From Conversation<br>to <span class="yf-accent">Production Code</span></h2>
+        <p>Watch Yappaflow capture a client call, generate a full e-commerce store, and deploy it &mdash; all in real-time.</p>
+      </div>
+
+      <div class="yf-showcase-split yf-animate-scale" style="--yf-delay: 0.2s">
+        <!-- Chat Panel -->
+        <div class="yf-showcase-panel yf-showcase-chat">
+          <div class="yf-panel-header">
+            <span class="yf-panel-dot"></span>
+            <span class="yf-panel-title">Client Call &mdash; Live</span>
+          </div>
+          <div class="yf-chat-messages">
+            <div class="yf-chat-msg yf-chat-msg-client">
+              <div class="yf-chat-sender">Client</div>
+              <span class="yf-chat-text"></span><span class="yf-chat-cursor"></span>
+            </div>
+            <div class="yf-chat-msg yf-chat-msg-ai">
+              <div class="yf-chat-sender">Yappaflow AI</div>
+              <span class="yf-chat-text"></span><span class="yf-chat-cursor"></span>
+            </div>
+            <div class="yf-chat-msg yf-chat-msg-client">
+              <div class="yf-chat-sender">Client</div>
+              <span class="yf-chat-text"></span><span class="yf-chat-cursor"></span>
+            </div>
+            <div class="yf-chat-msg yf-chat-msg-ai">
+              <div class="yf-chat-sender">Yappaflow AI</div>
+              <span class="yf-chat-text"></span><span class="yf-chat-cursor"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Code Panel -->
+        <div class="yf-showcase-panel yf-showcase-code">
+          <div class="yf-panel-header">
+            <span class="yf-panel-dot"></span>
+            <span class="yf-panel-title">Code Generation &mdash; Live</span>
+          </div>
+          <div class="yf-code-window">
+            <div class="yf-code-line"><span class="yf-code-comment">// Generated by Yappaflow AI</span></div>
+            <div class="yf-code-line"><span class="yf-code-comment">// Shopify Storefront &mdash; Dark Minimal</span></div>
+            <div class="yf-code-line">&nbsp;</div>
+            <div class="yf-code-line"><span class="yf-code-keyword">import</span> <span class="yf-code-punct">{</span> <span class="yf-code-function">createTheme</span> <span class="yf-code-punct">}</span> <span class="yf-code-keyword">from</span> <span class="yf-code-string">'@shopify/hydrogen'</span></div>
+            <div class="yf-code-line"><span class="yf-code-keyword">import</span> <span class="yf-code-function">ProductGrid</span> <span class="yf-code-keyword">from</span> <span class="yf-code-string">'./components/ProductGrid'</span></div>
+            <div class="yf-code-line">&nbsp;</div>
+            <div class="yf-code-line"><span class="yf-code-keyword">const</span> <span class="yf-code-function">theme</span> <span class="yf-code-punct">=</span> <span class="yf-code-function">createTheme</span><span class="yf-code-punct">({</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-attr">colors</span><span class="yf-code-punct">:</span> <span class="yf-code-punct">{</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-attr">background</span><span class="yf-code-punct">:</span> <span class="yf-code-string">'#0A0A0A'</span><span class="yf-code-punct">,</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-attr">text</span><span class="yf-code-punct">:</span> <span class="yf-code-string">'#FAFAFA'</span><span class="yf-code-punct">,</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-attr">accent</span><span class="yf-code-punct">:</span> <span class="yf-code-string">'#C4A882'</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-punct">},</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-attr">typography</span><span class="yf-code-punct">:</span> <span class="yf-code-string">'minimal-sans'</span><span class="yf-code-punct">,</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-attr">locale</span><span class="yf-code-punct">:</span> <span class="yf-code-punct">[</span><span class="yf-code-string">'en'</span><span class="yf-code-punct">,</span> <span class="yf-code-string">'tr'</span><span class="yf-code-punct">]</span></div>
+            <div class="yf-code-line"><span class="yf-code-punct">})</span></div>
+            <div class="yf-code-line">&nbsp;</div>
+            <div class="yf-code-line"><span class="yf-code-keyword">export default function</span> <span class="yf-code-function">Store</span><span class="yf-code-punct">() {</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-keyword">return</span> <span class="yf-code-punct">(</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-tag">&lt;Layout</span> <span class="yf-code-attr">theme</span><span class="yf-code-punct">=</span><span class="yf-code-punct">{</span><span class="yf-code-function">theme</span><span class="yf-code-punct">}</span><span class="yf-code-tag">&gt;</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-tag">&lt;ProductGrid</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-attr">collection</span><span class="yf-code-punct">=</span><span class="yf-code-string">"handmade-ceramics"</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-attr">columns</span><span class="yf-code-punct">=</span><span class="yf-code-punct">{</span><span class="yf-code-number">3</span><span class="yf-code-punct">}</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-tag">/&gt;</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="yf-code-tag">&lt;/Layout&gt;</span></div>
+            <div class="yf-code-line">&nbsp;&nbsp;<span class="yf-code-punct">)</span></div>
+            <div class="yf-code-line"><span class="yf-code-punct">}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ECOSYSTEM ========== -->
+  <section class="yf-ecosystem yf-section" id="yf-ecosystem">
+    <div class="yf-container">
+      <div class="yf-ecosystem-header yf-animate">
+        <span class="yf-badge" style="margin-bottom: 1rem; display: inline-flex;">Integrations</span>
+        <h2>Every Platform.<br>Every Channel. <span class="yf-accent">Automated.</span></h2>
+        <p>Connect once. Yappaflow handles deployment, DNS, hosting, and client communication across every major platform.</p>
+      </div>
+
+      <div class="yf-bento-grid">
+        <!-- Shopify (2 cols) -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.1s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <h3 class="yf-bento-name">Shopify</h3>
+          <p class="yf-bento-desc">Deploy full storefronts with themes, products, and checkout flows. Yappaflow generates Liquid templates and Hydrogen components from a single conversation.</p>
+          <span class="yf-bento-tag">E-COMMERCE</span>
+        </div>
+
+        <!-- Webflow -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.2s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <h3 class="yf-bento-name">Webflow</h3>
+          <p class="yf-bento-desc">Create responsive Webflow projects with custom interactions via the API.</p>
+          <span class="yf-bento-tag">NO-CODE</span>
+        </div>
+
+        <!-- WordPress -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.3s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h3 class="yf-bento-name">WordPress</h3>
+          <p class="yf-bento-desc">Generate custom themes, plugins, and complete WordPress sites with WooCommerce integration.</p>
+          <span class="yf-bento-tag">CMS</span>
+        </div>
+
+        <!-- IKAS (2 cols) -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.4s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h3 class="yf-bento-name">IKAS</h3>
+          <p class="yf-bento-desc">Text-to-e-commerce for the Turkish market. Build and deploy IKAS storefronts with full localization support from voice or chat conversations.</p>
+          <span class="yf-bento-tag">TR MARKET</span>
+        </div>
+
+        <!-- Namecheap -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.5s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10"/><path d="M12 2a15.3 15.3 0 0 0-4 10 15.3 15.3 0 0 0 4 10"/></svg>
+          </div>
+          <h3 class="yf-bento-name">Namecheap</h3>
+          <p class="yf-bento-desc">Auto-purchase domains and configure DNS records instantly.</p>
+          <span class="yf-bento-tag">DOMAINS</span>
+        </div>
+
+        <!-- Hostinger -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.55s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+          </div>
+          <h3 class="yf-bento-name">Hostinger</h3>
+          <p class="yf-bento-desc">Provision VPS servers and deploy custom builds automatically.</p>
+          <span class="yf-bento-tag">HOSTING</span>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.6s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3 class="yf-bento-name">WhatsApp</h3>
+          <p class="yf-bento-desc">Capture client requirements directly from WhatsApp conversations.</p>
+          <span class="yf-bento-tag">MESSAGING</span>
+        </div>
+
+        <!-- Instagram -->
+        <div class="yf-bento-card yf-animate-scale" style="--yf-delay: 0.65s">
+          <div class="yf-bento-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </div>
+          <h3 class="yf-bento-name">Instagram</h3>
+          <p class="yf-bento-desc">Listen to client DMs and auto-extract project briefs from Instagram.</p>
+          <span class="yf-bento-tag">SOCIAL</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER CTA ========== -->
+  <section class="yf-footer-cta yf-section" id="yf-cta">
+    <div class="yf-container">
+      <div class="yf-footer-cta-content">
+        <h2 class="yf-footer-headline yf-animate">
+          Your next 100 websites,<br>
+          <span class="yf-accent">built by voice.</span>
+        </h2>
+
+        <p class="yf-footer-sub yf-animate" style="--yf-delay: 0.1s">
+          Run your real client projects through Yappaflow. Watch builds get
+          generated and deployed at the source.
+        </p>
+
+        <form class="yf-footer-form yf-waitlist-form yf-animate" style="--yf-delay: 0.2s" autocomplete="off">
+          <input type="email" class="yf-input" placeholder="your@agency.com" required aria-label="Email address">
+          <button type="submit" class="yf-btn-primary">Get Early Access</button>
+        </form>
+
+        <div class="yf-form-success" style="justify-content: center;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="8" cy="8" r="7" stroke="#00F0FF" stroke-width="1.5"/>
+            <path d="M5 8l2 2 4-4" stroke="#00F0FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>You're on the list. We'll be in touch.</span>
+        </div>
+
+        <div class="yf-social-proof yf-animate" style="--yf-delay: 0.3s">
+          <span class="yf-social-proof-dot"></span>
+          <span>500+ agencies on the waitlist</span>
+        </div>
+      </div>
+
+      <footer class="yf-mini-footer">
+        <div>
+          <span class="yf-footer-brand">Yappaflow</span>
+          <span class="yf-muted"> &mdash; Istanbul, Turkiye</span>
+        </div>
+        <div class="yf-mini-footer-links">
+          <a href="mailto:hello@yappaflow.com">hello@yappaflow.com</a>
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+        </div>
+        <div class="yf-muted">&copy; 2026 Yappaflow. All rights reserved.</div>
+      </footer>
+    </div>
+  </section>
+
+</div>
+
+<!-- JavaScript -->
+<script src="js/intersection-observer.js"></script>
+<script src="js/voice-wave.js"></script>
+<script src="js/typewriter.js"></script>
+<script src="js/code-generator.js"></script>
+<script src="js/waitlist-form.js"></script>
+
+</body>
+</html>

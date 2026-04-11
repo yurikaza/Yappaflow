@@ -1,0 +1,135 @@
+/* ============================================
+   YAPPAFLOW PROMO — Keyframes & Animation Classes
+   ============================================ */
+
+/* --- Entrance Animations (triggered by IntersectionObserver) --- */
+.yf-animate {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity var(--yf-duration) var(--yf-ease),
+    transform var(--yf-duration) var(--yf-ease);
+  transition-delay: var(--yf-delay, 0s);
+}
+
+.yf-animate.yf-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.yf-animate-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition:
+    opacity var(--yf-duration) var(--yf-ease),
+    transform var(--yf-duration) var(--yf-ease);
+  transition-delay: var(--yf-delay, 0s);
+}
+.yf-animate-left.yf-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.yf-animate-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition:
+    opacity var(--yf-duration) var(--yf-ease),
+    transform var(--yf-duration) var(--yf-ease);
+  transition-delay: var(--yf-delay, 0s);
+}
+.yf-animate-right.yf-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.yf-animate-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition:
+    opacity var(--yf-duration) var(--yf-ease),
+    transform var(--yf-duration) var(--yf-ease);
+  transition-delay: var(--yf-delay, 0s);
+}
+.yf-animate-scale.yf-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- Keyframes --- */
+@keyframes yf-pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes yf-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 240, 255, 0.5), 0 0 80px rgba(0, 240, 255, 0.2);
+  }
+}
+
+@keyframes yf-typing-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes yf-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes yf-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes yf-scan-line {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+@keyframes yf-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes yf-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes yf-border-glow {
+  0%, 100% {
+    border-color: var(--yf-border);
+  }
+  50% {
+    border-color: rgba(0, 240, 255, 0.3);
+  }
+}
+
+/* --- Reduced Motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .yf-animate,
+  .yf-animate-left,
+  .yf-animate-right,
+  .yf-animate-scale {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
