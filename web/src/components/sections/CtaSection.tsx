@@ -3,78 +3,50 @@
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
-import { GradientBackground } from "@/components/ui/GradientBackground";
 import { Button } from "@/components/ui/Button";
+import { ArrowUpRight } from "lucide-react";
 
 export function CtaSection() {
   const t = useTranslations("cta");
 
   return (
-    <section id="cta">
-      <GradientBackground variant="cool" className="py-20 sm:py-28">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="grid gap-12 lg:grid-cols-2 items-center"
+    <section id="cta" className="py-24 sm:py-40 bg-brand-surface-secondary text-brand-text-primary overflow-hidden">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Massive mixed-color typography like lenis */}
+          <h2 className="font-heading uppercase tracking-tight leading-[0.9]"
+            style={{ fontSize: "clamp(3rem, 10vw, 10rem)" }}
           >
-            {/* Left */}
-            <div>
-              <p className="text-sm font-medium text-white/60 uppercase tracking-wider mb-2">
-                10 Minutes. Your Content. Live Results.
-              </p>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                {t("headline")}
-              </h2>
-              <p className="mt-4 text-white/70 leading-relaxed">
-                {t("description")}
-              </p>
+            <span className="text-brand-text-primary">Yappaflow is</span>
+            <br />
+            <span className="text-brand-orange">your new</span>
+            <br />
+            <span className="text-brand-text-primary">agency</span>{" "}
+            <span className="text-brand-text-tertiary">pipeline</span>
+          </h2>
+        </motion.div>
 
-              {/* Email Form */}
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder={t("emailPlaceholder")}
-                  className="flex-1 rounded-lg bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <Button className="bg-white text-brand-black hover:bg-gray-100" size="lg">
-                  {t("getDemo")}
-                </Button>
-              </div>
-
-              <div className="mt-3">
-                <Button
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                  size="sm"
-                >
-                  {t("watchDemo")}
-                </Button>
-              </div>
-            </div>
-
-            {/* Right: Testimonial */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <blockquote className="text-lg text-white/90 italic leading-relaxed">
-                {t("testimonial")}
-              </blockquote>
-              <div className="mt-4">
-                <p className="text-sm font-semibold text-white">
-                  {t("testimonialAuthor")}
-                </p>
-                <p className="text-sm text-white/60">{t("testimonialCompany")}</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </Container>
-      </GradientBackground>
+        {/* CTA row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mt-12 flex flex-col sm:flex-row gap-4"
+        >
+          <Button
+            href="#"
+            className="bg-brand-orange text-white hover:bg-brand-orange-dark rounded-none px-10 py-5 text-xs uppercase tracking-widest"
+          >
+            {t("getDemo")} <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+          </Button>
+        </motion.div>
+      </Container>
     </section>
   );
 }

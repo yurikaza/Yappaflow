@@ -10,23 +10,25 @@ interface SectionHeadingProps {
 export function SectionHeading({
   title,
   subtitle,
-  align = "center",
+  align = "left",
   className,
 }: SectionHeadingProps) {
   return (
     <div
       className={cn(
-        "mb-12",
+        "mb-16",
         align === "center" && "text-center",
         className
       )}
     >
-      <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+      <h2 className="font-heading text-4xl uppercase tracking-tight text-brand-text-primary sm:text-5xl lg:text-6xl">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-4 max-w-2xl text-lg text-brand-gray-200 mx-auto leading-relaxed"
-          style={{ color: "#6B7280" }}>
+        <p className={cn(
+          "mt-6 max-w-2xl text-base text-brand-text-secondary leading-relaxed sm:text-lg",
+          align === "center" && "mx-auto"
+        )}>
           {subtitle}
         </p>
       )}

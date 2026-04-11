@@ -24,13 +24,13 @@ export function LogoBar({ label, className }: LogoBarProps) {
   return (
     <div className={cn("text-center", className)}>
       {label && (
-        <p className="mb-6 text-sm text-gray-500">{label}</p>
+        <p className="mb-6 text-sm text-brand-text-tertiary">{label}</p>
       )}
       <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
         {logos.map(({ name, Icon }) => (
           <div
             key={name}
-            className="flex items-center gap-2 text-gray-400 transition-colors hover:text-gray-600"
+            className="flex items-center gap-2 text-brand-text-tertiary transition-colors hover:text-brand-text-secondary"
           >
             <Icon className="h-5 w-5" />
             <span className="text-sm font-semibold tracking-wide">{name}</span>
