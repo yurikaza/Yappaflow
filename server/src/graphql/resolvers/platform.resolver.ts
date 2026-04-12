@@ -85,6 +85,19 @@ export const platformResolvers = {
         },
         { upsert: true, new: true }
       );
+
+      // Subscribe this WABA to receive webhook events
+      try {
+        await axios.post(
+          `https://graph.facebook.com/v19.0/${wabaId}/subscribed_apps`,
+          {},
+          { headers: { Authorization: `Bearer ${input.accessToken}` } }
+        );
+        log(`WA: WABA ${wabaId} subscribed to webhooks`);
+      } catch (err: unknown) {
+        logError("WA webhook subscription failed (non-fatal)", err);
+      }
+
       return serializeConn(doc);
     },
 
@@ -191,7 +204,7 @@ export const platformResolvers = {
       let igData: { id: string; username?: string; instagram_business_account?: { id: string } };
       try {
         const { data } = await axios.get("https://graph.facebook.com/v19.0/me/accounts", {
-          params: { fields: "instagram_business_account,name", access_token: accessToken },
+          params: { fields: "instagram_business_account,name,access_token", access_token: accessToken },
         });
         const page = data.data?.[0];
         const igAccountId = page?.instagram_business_account?.id;
@@ -201,6 +214,16 @@ export const platformResolvers = {
           params: { fields: "id,username", access_token: accessToken },
         });
         igData = { id: igProfile.data.id, username: igProfile.data.username, instagram_business_account: { id: igAccountId } };
+
+        // Subscribe page to messaging webhooks so we receive Instagram DMs
+        const pageId = page.id;
+        const pageAccessToken = page.access_token ?? accessToken;
+        await axios.post(
+          `https://graph.facebook.com/v19.0/${pageId}/subscribed_apps`,
+          null,
+          { params: { subscribed_fields: "messages", access_token: pageAccessToken } }
+        );
+        log(`IG: subscribed page ${pageId} to messaging webhooks`);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Instagram credentials invalid";
         throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });

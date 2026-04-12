@@ -1,21 +1,25 @@
 "use client";
 
-import { Zap, MessageCircle, Code, Rocket, Globe, ShoppingBag, BarChart3, Shield } from "lucide-react";
 import { motion } from "framer-motion";
-import { ShadcnButton } from "@/components/ui/shadcn-button";
+import { ArrowUpRight, Sparkles, Rocket, Code, Globe, Shield, ShoppingBag, MessageCircle, BarChart3 } from "lucide-react";
+import { ParticleGlobe } from "@/components/ui/ParticleGlobe";
 
 interface Hero115Props {
   heading: string;
   description: string;
   button: {
     text: string;
-    icon?: React.ReactNode;
     url: string;
   };
+  secondaryButton?: {
+    text: string;
+    url: string;
+  };
+  badgeText?: string;
   trustText?: string;
 }
 
-/* ── Fake dashboard that shows platform capabilities ── */
+/* ── Dashboard Preview ── */
 function DashboardPreview() {
   const projects = [
     { name: "Fashion Store", platform: "Shopify", status: "Live", progress: 100 },
@@ -32,105 +36,90 @@ function DashboardPreview() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className="mx-auto w-full max-w-screen-lg"
     >
-      <div className="rounded-2xl border border-white/[0.08] bg-brand-dark-card overflow-hidden shadow-2xl shadow-black/40">
+      <div className="rounded-xl border border-white/[0.08] bg-[#0d1117] overflow-hidden shadow-2xl shadow-black/60">
         {/* Browser chrome */}
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.06] bg-white/[0.02]">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.06] bg-[#161b22]">
           <div className="flex gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
-            <div className="w-2.5 h-2.5 rounded-full bg-white/10" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
           </div>
           <div className="flex-1 mx-8">
-            <div className="bg-white/[0.04] rounded-md px-3 py-1 text-[11px] text-white/30 text-center max-w-xs mx-auto">
+            <div className="bg-white/[0.06] rounded px-3 py-1 text-[11px] text-white/30 text-center max-w-xs mx-auto">
               app.yappaflow.com/dashboard
             </div>
           </div>
         </div>
 
-        <div className="p-5 sm:p-6">
-          {/* Stats row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        <div className="p-4 sm:p-5">
+          {/* Stats */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.8 + i * 0.1 }}
-                className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3"
+                transition={{ duration: 0.5, delay: 1.0 + i * 0.08 }}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-3"
               >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <stat.icon className="h-3.5 w-3.5 text-brand-orange/70" />
-                  <span className="text-[10px] uppercase tracking-wider text-white/30">{stat.label}</span>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <stat.icon className="h-3 w-3 text-brand-orange/70" />
+                  <span className="text-[9px] uppercase tracking-wider text-white/25">{stat.label}</span>
                 </div>
-                <span className="text-lg font-semibold text-white">{stat.value}</span>
+                <span className="text-base font-semibold text-white">{stat.value}</span>
               </motion.div>
             ))}
           </div>
 
-          {/* Projects table */}
+          {/* Projects */}
           <div className="rounded-lg border border-white/[0.06] overflow-hidden">
-            {/* Table header */}
-            <div className="grid grid-cols-[1fr_auto_auto_1fr] gap-4 px-4 py-2.5 bg-white/[0.02] border-b border-white/[0.06] text-[10px] uppercase tracking-wider text-white/25">
-              <span>Project</span>
-              <span>Platform</span>
-              <span>Status</span>
-              <span>Progress</span>
+            <div className="grid grid-cols-[1fr_auto_auto_1fr] gap-4 px-4 py-2 bg-white/[0.02] border-b border-white/[0.06] text-[9px] uppercase tracking-wider text-white/20">
+              <span>Project</span><span>Platform</span><span>Status</span><span>Progress</span>
             </div>
-
-            {/* Table rows */}
-            {projects.map((project, i) => (
+            {projects.map((p, i) => (
               <motion.div
-                key={project.name}
-                initial={{ opacity: 0, x: -20 }}
+                key={p.name}
+                initial={{ opacity: 0, x: -15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 1.0 + i * 0.12 }}
-                className="grid grid-cols-[1fr_auto_auto_1fr] gap-4 items-center px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors"
+                transition={{ duration: 0.5, delay: 1.2 + i * 0.1 }}
+                className="grid grid-cols-[1fr_auto_auto_1fr] gap-4 items-center px-4 py-2.5 border-b border-white/[0.04] last:border-0"
               >
-                <span className="text-sm text-white font-medium">{project.name}</span>
-                <span className="text-xs text-white/40 flex items-center gap-1.5">
-                  <ShoppingBag className="h-3 w-3" />
-                  {project.platform}
+                <span className="text-xs text-white font-medium">{p.name}</span>
+                <span className="text-[10px] text-white/35 flex items-center gap-1">
+                  <ShoppingBag className="h-2.5 w-2.5" />{p.platform}
                 </span>
-                <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                  project.status === "Live"
-                    ? "bg-green-500/10 text-green-400"
-                    : project.status === "Building"
-                    ? "bg-brand-orange/10 text-brand-orange"
+                <span className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                  p.status === "Live" ? "bg-green-500/10 text-green-400"
+                    : p.status === "Building" ? "bg-brand-orange/10 text-brand-orange"
                     : "bg-blue-500/10 text-blue-400"
-                }`}>
-                  {project.status}
-                </span>
+                }`}>{p.status}</span>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                  <div className="flex-1 h-1 bg-white/[0.06] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${project.progress}%` }}
-                      transition={{ duration: 1.2, delay: 1.2 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                      className={`h-full rounded-full ${
-                        project.progress === 100 ? "bg-green-500" : "bg-brand-orange"
-                      }`}
+                      animate={{ width: `${p.progress}%` }}
+                      transition={{ duration: 1.2, delay: 1.4 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                      className={`h-full rounded-full ${p.progress === 100 ? "bg-green-500" : "bg-brand-orange"}`}
                     />
                   </div>
-                  <span className="text-[11px] text-white/30 w-8 text-right">{project.progress}%</span>
+                  <span className="text-[10px] text-white/25 w-7 text-right">{p.progress}%</span>
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Bottom action row */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-2 text-[11px] text-white/20">
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span>3 active client conversations</span>
+          {/* Bottom row */}
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center gap-1.5 text-[10px] text-white/15">
+              <MessageCircle className="h-3 w-3" /><span>3 active conversations</span>
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-brand-orange">
-              <BarChart3 className="h-3.5 w-3.5" />
-              <span>View Analytics</span>
+            <div className="flex items-center gap-1.5 text-[10px] text-brand-orange/60">
+              <BarChart3 className="h-3 w-3" /><span>Analytics</span>
             </div>
           </div>
         </div>
@@ -143,68 +132,89 @@ const Hero115 = ({
   heading,
   description,
   button,
-  trustText,
+  secondaryButton,
+  badgeText,
 }: Hero115Props) => {
+  const parts = heading.split(".");
+  const line1 = parts[0]?.trim() || "";
+  const line2 = parts[1]?.trim() || "";
+
   return (
-    <section className="overflow-hidden py-32 bg-brand-dark text-white">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-5">
-          <div className="relative flex flex-col gap-5">
-            {/* Concentric circle decoration */}
-            <div
-              style={{ transform: "translate(-50%, -50%)" }}
-              className="absolute left-1/2 top-1/2 -z-10 mx-auto size-[800px] rounded-full border border-white/[0.06] p-16 [mask-image:linear-gradient(to_top,transparent,transparent,white,white,white,transparent,transparent)] md:size-[1300px] md:p-32"
-            >
-              <div className="size-full rounded-full border border-white/[0.06] p-16 md:p-32">
-                <div className="size-full rounded-full border border-white/[0.06]"></div>
-              </div>
-            </div>
+    <section className="relative overflow-hidden bg-brand-dark text-white pt-28 pb-16 min-h-svh">
+      {/* Particle Globe background */}
+      <div className="absolute inset-0 z-0">
+        <ParticleGlobe className="w-full h-full" />
+      </div>
 
-            {/* Heading */}
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="mx-auto max-w-screen-lg text-balance text-center font-heading text-4xl uppercase tracking-tight md:text-7xl lg:text-8xl"
-            >
-              {heading.split(".")[0]}.
-              <br />
-              <span className="text-brand-orange">{heading.split(".")[1]?.trim()}</span>
-            </motion.h2>
+      {/* Extra ambient glow */}
+      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-brand-orange/[0.04] blur-[150px] pointer-events-none" />
 
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mx-auto max-w-screen-md text-center text-white/50 md:text-lg"
-            >
-              {description}
-            </motion.p>
-
-            {/* CTA */}
+      {/* Content */}
+      <div className="relative z-10 container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center text-center">
+          {/* Badge */}
+          {badgeText && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-col items-center justify-center gap-3 pb-12 pt-3"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] backdrop-blur-sm px-4 py-2"
             >
-              <ShadcnButton
-                size="lg"
-                asChild
-                className="bg-brand-orange text-white hover:bg-brand-orange-dark rounded-none px-10 py-6 text-xs uppercase tracking-widest"
-              >
-                <a href={button.url}>
-                  {button.text} {button.icon}
-                </a>
-              </ShadcnButton>
-              {trustText && (
-                <div className="text-xs text-white/30">{trustText}</div>
-              )}
+              <Sparkles className="h-3.5 w-3.5 text-brand-orange" />
+              <span className="text-xs font-medium text-white/70">{badgeText}</span>
             </motion.div>
-          </div>
+          )}
 
-          {/* Dashboard preview */}
+          {/* Heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase tracking-tight leading-[0.95]"
+          >
+            {line1}
+            <br />
+            {line2 && <>{line2}.</>}
+          </motion.h1>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-6 max-w-xl text-base sm:text-lg text-white/40 leading-relaxed"
+          >
+            {description}
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-4"
+          >
+            <a
+              href={button.url}
+              className="inline-flex items-center gap-2 bg-white text-brand-dark text-sm font-medium px-7 py-3.5 rounded-full hover:bg-white/90 transition-colors"
+            >
+              {button.text}
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+            {secondaryButton && (
+              <a
+                href={secondaryButton.url}
+                className="inline-flex items-center gap-2 border border-white/15 text-white text-sm font-medium px-7 py-3.5 rounded-full hover:border-white/30 hover:bg-white/[0.04] transition-all"
+              >
+                {secondaryButton.text}
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Dashboard preview */}
+        <div className="mt-16">
           <DashboardPreview />
         </div>
       </div>

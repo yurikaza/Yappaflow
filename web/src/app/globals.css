@@ -66,6 +66,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Perspective */
+.perspective-1200 {
+  perspective: 1200px;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* Glass */
 .glass {
   background: rgba(255, 255, 255, 0.55);

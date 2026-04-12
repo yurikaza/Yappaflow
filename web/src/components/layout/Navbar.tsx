@@ -24,13 +24,23 @@ export function Navbar() {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.key}
-              href={link.href}
-              className="text-[11px] uppercase tracking-widest text-white/40 transition-colors hover:text-white"
-            >
-              {t(link.key)}
-            </a>
+            link.href.startsWith("/") ? (
+              <Link
+                key={link.key}
+                href={link.href}
+                className="text-[11px] uppercase tracking-widest text-white/40 transition-colors hover:text-white"
+              >
+                {t(link.key)}
+              </Link>
+            ) : (
+              <a
+                key={link.key}
+                href={link.href}
+                className="text-[11px] uppercase tracking-widest text-white/40 transition-colors hover:text-white"
+              >
+                {t(link.key)}
+              </a>
+            )
           ))}
         </div>
 

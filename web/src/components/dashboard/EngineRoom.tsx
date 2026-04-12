@@ -23,16 +23,16 @@ function formatTime(ts: string) {
 // ── No signal selected ────────────────────────────────────────────────────────
 function EmptyState({ setView }: { setView: (v: DashboardView) => void }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 text-center p-8 bg-[#F5F5F5]">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white border border-[#EFEFEF]">
-        <MessageCircle size={22} className="text-[#C0C0C0]" />
+    <div className="flex h-full flex-col items-center justify-center gap-4 text-center p-8 bg-[#0A0A0A]">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111114] border border-white/[0.05]">
+        <MessageCircle size={22} className="text-white/20" />
       </div>
       <div>
-        <p className="text-[15px] font-bold text-[#0A0A0A]">No conversation selected</p>
-        <p className="mt-1 text-[13px] text-[#737373]">Click a signal on the dashboard to open its chat thread</p>
+        <p className="text-[15px] font-bold text-white">No conversation selected</p>
+        <p className="mt-1 text-[13px] text-white/30">Click a signal on the dashboard to open its chat thread</p>
       </div>
       <button onClick={() => setView("command")}
-        className="rounded-xl border border-[#EFEFEF] bg-white px-5 py-2 text-[13px] font-semibold text-[#737373] hover:bg-[#F8F8F8]">
+        className="rounded-xl border border-white/[0.05] bg-[#111114] px-5 py-2 text-[13px] font-semibold text-white/30 hover:bg-white/[0.04]">
         ← Back to Dashboard
       </button>
     </div>
@@ -42,9 +42,9 @@ function EmptyState({ setView }: { setView: (v: DashboardView) => void }) {
 // ── Consent notice ────────────────────────────────────────────────────────────
 function ConsentNotice() {
   return (
-    <div className="flex items-start gap-2.5 rounded-xl border border-[#E8F0FF] bg-[#F0F5FF] px-4 py-3 mx-4 mt-3">
-      <Lock size={13} className="text-blue-500 flex-shrink-0 mt-0.5" />
-      <p className="text-[11px] text-blue-700 leading-relaxed">
+    <div className="flex items-start gap-2.5 rounded-xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 mx-4 mt-3">
+      <Lock size={13} className="text-blue-400 flex-shrink-0 mt-0.5" />
+      <p className="text-[11px] text-blue-300 leading-relaxed">
         <strong>Data with your permission.</strong> These messages are fetched from your connected
         WhatsApp / Instagram account. You authorized Yappaflow to access them during login.
         You can disconnect at any time in <strong>Settings → Platforms</strong>.
@@ -156,17 +156,17 @@ export function EngineRoom({ setView, signalId }: Props) {
   const platformColor = isWA ? "#25D366" : "#E1306C";
 
   return (
-    <div className="flex flex-col h-full bg-[#F5F5F5]">
+    <div className="flex flex-col h-full bg-[#0A0A0A]">
 
       {/* Header */}
-      <div className="flex items-center justify-between bg-white border-b border-[#EFEFEF] px-6 py-3 flex-shrink-0">
+      <div className="flex items-center justify-between bg-[#0c0c0f] border-b border-white/[0.05] px-6 py-3 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: platformColor + "15" }}>
             <PlatformIcon size={17} style={{ color: platformColor }} />
           </div>
           <div>
-            <h2 className="text-[15px] font-black leading-none">{signal?.senderName ?? "Loading…"}</h2>
-            <p className="text-[11px] text-[#B5B5B5] mt-0.5">{signal?.sender ?? ""}</p>
+            <h2 className="text-[15px] font-black leading-none text-white">{signal?.senderName ?? "Loading…"}</h2>
+            <p className="text-[11px] text-white/20 mt-0.5">{signal?.sender ?? ""}</p>
           </div>
           <span className="flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ml-1"
             style={{ backgroundColor: platformColor + "10", borderColor: platformColor + "30", color: platformColor }}>
@@ -177,13 +177,13 @@ export function EngineRoom({ setView, signalId }: Props) {
 
         <div className="flex items-center gap-2">
           <button onClick={() => setView("deploy")}
-            className="flex items-center gap-1.5 rounded-xl bg-[#F97316] px-3.5 py-1.5 text-[12px] font-bold text-white hover:opacity-90 transition-opacity">
+            className="flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-3.5 py-1.5 text-[12px] font-bold text-white hover:opacity-90 transition-opacity">
             <Zap size={12} />
             Deploy
             <ChevronRight size={12} />
           </button>
           <button onClick={() => setView("command")}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EFEFEF] bg-white text-[#737373] hover:text-[#0A0A0A] transition-colors">
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.05] bg-[#111114] text-white/30 hover:text-white transition-colors">
             <X size={14} />
           </button>
         </div>
@@ -197,15 +197,15 @@ export function EngineRoom({ setView, signalId }: Props) {
 
         {loading && (
           <div className="flex items-center justify-center py-10">
-            <Loader2 size={20} className="animate-spin text-[#B5B5B5]" />
+            <Loader2 size={20} className="animate-spin text-white/20" />
           </div>
         )}
 
         {serverErr && (
           <div className="flex flex-col items-center justify-center py-10 gap-3 text-center">
-            <p className="text-[13px] text-[#737373]">Could not load messages — server offline</p>
+            <p className="text-[13px] text-white/30">Could not load messages — server offline</p>
             <button onClick={loadMessages}
-              className="rounded-lg border border-[#EFEFEF] bg-white px-4 py-1.5 text-[12px] font-semibold text-[#737373] hover:bg-[#F8F8F8]">
+              className="rounded-lg border border-white/[0.05] bg-[#111114] px-4 py-1.5 text-[12px] font-semibold text-white/30 hover:bg-white/[0.04]">
               Retry
             </button>
           </div>
@@ -213,8 +213,8 @@ export function EngineRoom({ setView, signalId }: Props) {
 
         {!loading && !serverErr && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-10 gap-2 text-center">
-            <p className="text-[13px] text-[#737373]">No messages yet</p>
-            <p className="text-[11px] text-[#B5B5B5]">
+            <p className="text-[13px] text-white/30">No messages yet</p>
+            <p className="text-[11px] text-white/20">
               Messages will appear here when {signal?.senderName ?? "the customer"} writes to you
             </p>
           </div>
@@ -230,17 +230,17 @@ export function EngineRoom({ setView, signalId }: Props) {
               >
                 <div className="max-w-[72%] space-y-0.5">
                   {!isOut && (
-                    <p className="text-[10px] font-semibold text-[#B5B5B5] px-1">{msg.senderName}</p>
+                    <p className="text-[10px] font-semibold text-white/20 px-1">{msg.senderName}</p>
                   )}
                   <div className={[
                     "rounded-2xl px-4 py-2.5 text-[13px] leading-relaxed",
                     isOut
-                      ? "bg-[#F97316] text-white rounded-br-sm"
-                      : "bg-white border border-[#EFEFEF] text-[#0A0A0A] rounded-bl-sm",
+                      ? "bg-[#FF6B35] text-white rounded-br-sm"
+                      : "bg-[#111114] border border-white/[0.05] text-white rounded-bl-sm",
                   ].join(" ")}>
                     {msg.text}
                   </div>
-                  <p className={`text-[10px] text-[#B5B5B5] px-1 ${isOut ? "text-right" : "text-left"}`}>
+                  <p className={`text-[10px] text-white/20 px-1 ${isOut ? "text-right" : "text-left"}`}>
                     {formatTime(msg.timestamp)}
                   </p>
                 </div>
@@ -251,25 +251,25 @@ export function EngineRoom({ setView, signalId }: Props) {
       </div>
 
       {/* Reply box */}
-      <div className="flex-shrink-0 border-t border-[#EFEFEF] bg-white p-4">
+      <div className="flex-shrink-0 border-t border-white/[0.05] bg-[#0c0c0f] p-4">
         {sendErr && (
           <p className="mb-2 text-[11px] text-red-500">{sendErr}</p>
         )}
-        <div className="flex items-center gap-2 rounded-xl border border-[#EFEFEF] bg-[#F8F8F8] px-4 py-2">
+        <div className="flex items-center gap-2 rounded-xl border border-white/[0.05] bg-white/[0.04] px-4 py-2">
           <input
             ref={inputRef}
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             placeholder={`Reply to ${signal?.senderName ?? "customer"}…`}
-            className="flex-1 bg-transparent text-[13px] text-[#0A0A0A] placeholder-[#B5B5B5] outline-none"
+            className="flex-1 bg-transparent text-[13px] text-white placeholder-white/20 outline-none"
           />
           <button onClick={handleSend} disabled={!reply.trim() || sending}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F97316] text-white disabled:opacity-40 hover:opacity-90 transition-opacity flex-shrink-0">
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#FF6B35] text-white disabled:opacity-40 hover:opacity-90 transition-opacity flex-shrink-0">
             {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
           </button>
         </div>
-        <p className="mt-1.5 text-center text-[10px] text-[#C0C0C0]">
+        <p className="mt-1.5 text-center text-[10px] text-white/15">
           Requires WhatsApp Business API token in Settings → Platforms
         </p>
       </div>

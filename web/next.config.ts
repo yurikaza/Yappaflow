@@ -4,6 +4,7 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['three', '@react-three/fiber', '@react-three/drei'],
   // Proxy API calls through Next.js so the app works via a single ngrok tunnel.
   // When accessed from a phone via ngrok, the browser can't reach localhost:4000
   // directly, so Next.js proxies /api/* → localhost:4000/*

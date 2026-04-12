@@ -1,52 +1,73 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 export function CtaSection() {
-  const t = useTranslations("cta");
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "start 30%"] });
+  const headingO = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const headingY = useTransform(scrollYProgress, [0, 1], [80, 0]);
 
   return (
-    <section id="cta" className="py-24 sm:py-40 bg-brand-surface-secondary text-brand-text-primary overflow-hidden">
-      <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {/* Massive mixed-color typography like lenis */}
-          <h2 className="font-heading uppercase tracking-tight leading-[0.9]"
-            style={{ fontSize: "clamp(3rem, 10vw, 10rem)" }}
-          >
-            <span className="text-brand-text-primary">Yappaflow is</span>
-            <br />
-            <span className="text-brand-orange">your new</span>
-            <br />
-            <span className="text-brand-text-primary">agency</span>{" "}
-            <span className="text-brand-text-tertiary">pipeline</span>
-          </h2>
-        </motion.div>
+    <section ref={sectionRef} className="relative bg-brand-dark py-32 sm:py-44 overflow-hidden">
+      {/* Atmosphere */}
+      <div className="absolute inset-0">
+        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-brand-orange/[0.03] blur-[200px]" />
+      </div>
 
-        {/* CTA row */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-12 flex flex-col sm:flex-row gap-4"
-        >
-          <Button
-            href="#"
-            className="bg-brand-orange text-white hover:bg-brand-orange-dark rounded-none px-10 py-5 text-xs uppercase tracking-widest"
-          >
-            {t("getDemo")} <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
-          </Button>
+      {/* Grain */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44IiBudW1PY3RhdmVzPSI0IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNuKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==")`,
+          backgroundRepeat: "repeat",
+        }}
+      />
+
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <motion.div style={{ opacity: headingO, y: headingY }}>
+          {/* Eyebrow */}
+          <p className="text-[10px] uppercase tracking-[0.5em] text-brand-orange/60 mb-8">
+            Get Started
+          </p>
+
+          {/* Massive headline */}
+          <h2 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl uppercase tracking-tight leading-[0.9] text-white mb-10">
+            Ready to<br />
+            <span className="text-brand-orange">automate</span><br />
+            your agency?
+          </h2>
+
+          {/* Description */}
+          <p className="text-sm sm:text-base text-white/30 max-w-lg leading-relaxed mb-10">
+            Join agencies already shipping faster with Yappaflow. Connect your channels, generate code from conversations, and deploy in minutes — not weeks.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="#"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange text-white text-xs uppercase tracking-widest px-10 py-5 hover:bg-brand-orange-dark transition-colors"
+            >
+              Start Free Trial
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+            <a
+              href="#"
+              className="inline-flex items-center justify-center gap-2 border border-white/10 text-white/60 text-xs uppercase tracking-widest px-10 py-5 hover:border-white/25 hover:text-white transition-all"
+            >
+              Book a Demo
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          {/* Trust line */}
+          <p className="mt-8 text-[10px] uppercase tracking-widest text-white/15">
+            No credit card required · Free for 14 days · Cancel anytime
+          </p>
         </motion.div>
-      </Container>
+      </div>
     </section>
   );
 }

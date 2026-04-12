@@ -32,8 +32,8 @@ function ApiKeyField({ label, service, placeholder, color }: {
 
   return (
     <div className={[
-      "rounded-xl border p-4 bg-white transition-all",
-      focused ? "shadow-sm" : "border-[#EFEFEF]",
+      "rounded-xl border p-4 bg-[#111114] transition-all",
+      focused ? "shadow-xl shadow-black/20" : "border-white/[0.05]",
     ].join(" ")}
       style={focused ? { borderColor: color + "60" } : {}}
     >
@@ -41,8 +41,8 @@ function ApiKeyField({ label, service, placeholder, color }: {
         <div className="flex items-center gap-2.5">
           <span className="h-2 w-2 rounded-full flex-shrink-0 mt-1" style={{ backgroundColor: color }} />
           <div>
-            <p className="text-[13px] font-semibold text-[#0A0A0A]">{label}</p>
-            <p className="text-[11px] text-[#B5B5B5]">{service}</p>
+            <p className="text-[13px] font-semibold text-white">{label}</p>
+            <p className="text-[11px] text-white/20">{service}</p>
           </div>
         </div>
         {connected && (
@@ -52,7 +52,7 @@ function ApiKeyField({ label, service, placeholder, color }: {
           </span>
         )}
       </div>
-      <div className={`flex items-center gap-2 rounded-lg border px-3 bg-[#F8F8F8] transition-colors ${focused ? "border-[#DEDEDE]" : "border-[#EFEFEF]"}`}>
+      <div className={`flex items-center gap-2 rounded-lg border px-3 bg-white/[0.04] transition-colors ${focused ? "border-white/[0.08]" : "border-white/[0.05]"}`}>
         <input
           type={visible ? "text" : "password"}
           value={value}
@@ -60,11 +60,11 @@ function ApiKeyField({ label, service, placeholder, color }: {
           placeholder={placeholder}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="flex-1 bg-transparent py-2.5 text-[12px] font-mono text-[#0A0A0A] placeholder-[#C0C0C0] outline-none"
+          className="flex-1 bg-transparent py-2.5 text-[12px] font-mono text-white placeholder-white/15 outline-none"
           autoComplete="off"
           spellCheck={false}
         />
-        <button onClick={() => setVisible((v) => !v)} className="text-[#C0C0C0] hover:text-[#737373] transition-colors">
+        <button onClick={() => setVisible((v) => !v)} className="text-white/15 hover:text-white/30 transition-colors">
           {visible ? <EyeOff size={13} /> : <Eye size={13} />}
         </button>
       </div>
@@ -76,7 +76,7 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: (v: boolean
   return (
     <button
       onClick={() => onChange(!enabled)}
-      className={`relative h-5 w-9 rounded-full transition-colors ${enabled ? "bg-[#F97316]" : "bg-[#DEDEDE]"}`}
+      className={`relative h-5 w-9 rounded-full transition-colors ${enabled ? "bg-[#FF6B35]" : "bg-white/[0.08]"}`}
     >
       <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${enabled ? "translate-x-4" : "translate-x-0.5"}`} />
     </button>
@@ -113,21 +113,21 @@ function WhatsAppForm({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="mt-3 space-y-3 rounded-xl border border-[#EFEFEF] bg-[#F8F8F8] p-4">
-      <p className="text-[11px] text-[#737373] leading-relaxed">
+    <div className="mt-3 space-y-3 rounded-xl border border-white/[0.05] bg-white/[0.04] p-4">
+      <p className="text-[11px] text-white/30 leading-relaxed">
         Paste your <strong>System User Access Token</strong> from Meta Business Manager.
         We&apos;ll auto-detect your WABA ID and phone number — no extra fields needed.
       </p>
-      <div className="flex items-center gap-2 rounded-lg border border-[#EFEFEF] bg-white px-3">
+      <div className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-[#111114] px-3">
         <input
           type={showToken ? "text" : "password"}
           value={token}
           onChange={(e) => setToken(e.target.value)}
           placeholder="EAAxxxxxxxxxxxxxx"
-          className="flex-1 bg-transparent py-2 text-[12px] font-mono outline-none"
+          className="flex-1 bg-transparent py-2 text-[12px] font-mono text-white outline-none"
           autoComplete="off"
         />
-        <button onClick={() => setShowToken((v) => !v)} className="text-[#C0C0C0] hover:text-[#737373]">
+        <button onClick={() => setShowToken((v) => !v)} className="text-white/15 hover:text-white/30">
           {showToken ? <EyeOff size={13} /> : <Eye size={13} />}
         </button>
       </div>
@@ -241,10 +241,10 @@ function WhatsAppEmbeddedSignup({ onSuccess }: { onSuccess: () => void }) {
   const hasConfigId = !!process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID;
 
   return (
-    <div className="mt-3 space-y-3 rounded-xl border border-[#EFEFEF] bg-[#F8F8F8] p-4">
+    <div className="mt-3 space-y-3 rounded-xl border border-white/[0.05] bg-white/[0.04] p-4">
       {hasConfigId ? (
         <>
-          <p className="text-[11px] text-[#737373] leading-relaxed">
+          <p className="text-[11px] text-white/30 leading-relaxed">
             Connect your WhatsApp Business account in <strong>one click</strong>. A Meta popup will open
             where you can select your business and phone number — no API keys needed.
           </p>
@@ -273,8 +273,8 @@ function WhatsAppEmbeddedSignup({ onSuccess }: { onSuccess: () => void }) {
         </>
       ) : (
         <p className="text-[11px] text-amber-600 leading-relaxed">
-          <strong>Embedded Signup not configured.</strong> Set <code className="bg-amber-50 px-1 rounded">NEXT_PUBLIC_WHATSAPP_CONFIG_ID</code> in
-          your <code className="bg-amber-50 px-1 rounded">.env.local</code> file. Create one at Meta Developer Console → WhatsApp → Embedded Signup.
+          <strong>Embedded Signup not configured.</strong> Set <code className="bg-amber-500/10 px-1 rounded">NEXT_PUBLIC_WHATSAPP_CONFIG_ID</code> in
+          your <code className="bg-amber-500/10 px-1 rounded">.env.local</code> file. Create one at Meta Developer Console → WhatsApp → Embedded Signup.
           <br /><br />
           Meanwhile, you can use the manual token method below.
         </p>
@@ -285,7 +285,7 @@ function WhatsAppEmbeddedSignup({ onSuccess }: { onSuccess: () => void }) {
       {/* Collapsible manual token fallback */}
       <button
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="flex items-center gap-1 text-[10px] text-[#B5B5B5] hover:text-[#737373] transition-colors"
+        className="flex items-center gap-1 text-[10px] text-white/20 hover:text-white/30 transition-colors"
       >
         <ChevronDown size={10} className={`transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
         Advanced: paste token manually
@@ -303,8 +303,8 @@ function InstagramOAuthButton() {
   };
 
   return (
-    <div className="mt-3 space-y-3 rounded-xl border border-[#EFEFEF] bg-[#F8F8F8] p-4">
-      <p className="text-[11px] text-[#737373] leading-relaxed">
+    <div className="mt-3 space-y-3 rounded-xl border border-white/[0.05] bg-white/[0.04] p-4">
+      <p className="text-[11px] text-white/30 leading-relaxed">
         Connect your Instagram Business account in one click. You&apos;ll be redirected to Meta
         to authorize Yappaflow to read your DMs.
       </p>
@@ -350,7 +350,7 @@ function ConnectedCard({
   const sub   = isWA ? conn.displayPhone : `@${conn.igUsername}`;
 
   return (
-    <div className="rounded-xl border border-[#EFEFEF] bg-white p-4 space-y-3">
+    <div className="rounded-xl border border-white/[0.05] bg-[#111114] p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ backgroundColor: color + "15" }}>
@@ -359,8 +359,8 @@ function ConnectedCard({
               : <Instagram     size={18} style={{ color }} />}
           </div>
           <div>
-            <p className="text-[13px] font-semibold text-[#0A0A0A]">{label}</p>
-            <p className="text-[11px] text-[#B5B5B5]">{sub}</p>
+            <p className="text-[13px] font-semibold text-white">{label}</p>
+            <p className="text-[11px] text-white/20">{sub}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -369,20 +369,20 @@ function ConnectedCard({
           </span>
           {isIG && (
             <button onClick={handleImport} disabled={importing}
-              className="flex items-center gap-1 rounded-lg border border-[#EFEFEF] px-2.5 py-1.5 text-[11px] font-semibold text-[#737373] hover:border-[#C0C0C0] hover:text-[#0A0A0A] transition-colors disabled:opacity-50">
+              className="flex items-center gap-1 rounded-lg border border-white/[0.05] px-2.5 py-1.5 text-[11px] font-semibold text-white/30 hover:border-white/[0.08] hover:text-white transition-colors disabled:opacity-50">
               {importing ? <Loader2 size={11} className="animate-spin" /> : <Download size={11} />}
               {importing ? "Importing…" : "Import Messages"}
             </button>
           )}
           <button onClick={handleDisconnect} disabled={disconnecting}
-            className="flex items-center gap-1 rounded-lg border border-[#EFEFEF] px-2.5 py-1.5 text-[11px] font-semibold text-[#737373] hover:border-red-200 hover:text-red-500 transition-colors disabled:opacity-50">
+            className="flex items-center gap-1 rounded-lg border border-white/[0.05] px-2.5 py-1.5 text-[11px] font-semibold text-white/30 hover:border-red-200 hover:text-red-500 transition-colors disabled:opacity-50">
             {disconnecting ? <Loader2 size={11} className="animate-spin" /> : <Unlink size={11} />}
             Disconnect
           </button>
         </div>
       </div>
       {isWA && (
-        <p className="text-[10px] text-[#B5B5B5] leading-relaxed px-1">
+        <p className="text-[10px] text-white/20 leading-relaxed px-1">
           WhatsApp message history is not available via the API — new messages will appear here in real-time as customers write to you.
         </p>
       )}
@@ -435,15 +435,15 @@ function ConnectPlatforms() {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl bg-white border border-[#EFEFEF] p-5">
+      <div className="rounded-2xl bg-[#0c0c0f] border border-white/[0.05] p-5">
         <h2 className="text-[14px] font-bold mb-1">Connected Platforms</h2>
-        <p className="text-[11px] text-[#B5B5B5] mb-4">
+        <p className="text-[11px] text-white/20 mb-4">
           Platforms auto-connect when you log in. Upgrade to receive real-time customer DMs.
         </p>
 
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 size={20} className="animate-spin text-[#B5B5B5]" />
+            <Loader2 size={20} className="animate-spin text-white/20" />
           </div>
         ) : (
           <div className="space-y-3">
@@ -457,18 +457,18 @@ function ConnectPlatforms() {
               <div key={id}>
                 <button
                   onClick={() => setExpand((prev) => prev === id ? null : id)}
-                  className="w-full flex items-center justify-between rounded-xl border border-dashed border-[#DEDEDE] px-4 py-3 hover:border-[#C0C0C0] transition-colors group"
+                  className="w-full flex items-center justify-between rounded-xl border border-dashed border-white/[0.08] px-4 py-3 hover:border-white/[0.12] transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F8F8F8] group-hover:bg-white transition-colors">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.04] group-hover:bg-white/[0.06] transition-colors">
                       <Icon size={16} style={{ color }} />
                     </div>
                     <div className="text-left">
-                      <p className="text-[12px] font-semibold text-[#0A0A0A]">{label}</p>
-                      <p className="text-[10px] text-[#B5B5B5] max-w-xs">{sub}</p>
+                      <p className="text-[12px] font-semibold text-white">{label}</p>
+                      <p className="text-[10px] text-white/20 max-w-xs">{sub}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 rounded-lg border border-[#EFEFEF] px-3 py-1.5 text-[11px] font-semibold text-[#737373] group-hover:border-[#DEDEDE] flex-shrink-0">
+                  <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.05] px-3 py-1.5 text-[11px] font-semibold text-white/30 group-hover:border-white/[0.08] flex-shrink-0">
                     <Link2 size={11} />
                     {expand === id ? "Cancel" : "Connect"}
                   </div>
@@ -507,7 +507,7 @@ export function IntegrationsSettings() {
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-black tracking-tight">Settings</h1>
-        <p className="mt-0.5 text-[13px] text-[#737373]">Manage your agency preferences and integrations</p>
+        <p className="mt-0.5 text-[13px] text-white/30">Manage your agency preferences and integrations</p>
       </div>
 
       <div className="flex gap-5">
@@ -518,7 +518,7 @@ export function IntegrationsSettings() {
               <button key={id} onClick={() => setSection(id)}
                 className={[
                   "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium text-left transition-all",
-                  section === id ? "bg-white border border-[#EFEFEF] text-[#0A0A0A] shadow-sm" : "text-[#737373] hover:bg-white hover:text-[#0A0A0A]",
+                  section === id ? "bg-[#111114] border border-white/[0.05] text-white shadow-xl shadow-black/20" : "text-white/30 hover:bg-white/[0.04] hover:text-white",
                 ].join(" ")}
               >
                 <Icon size={14} />
@@ -533,17 +533,17 @@ export function IntegrationsSettings() {
 
           {section === "profile" && (
             <div className="space-y-4">
-              <div className="rounded-2xl bg-white border border-[#EFEFEF] p-6">
+              <div className="rounded-2xl bg-[#0c0c0f] border border-white/[0.05] p-6">
                 <h2 className="text-[14px] font-bold mb-4">Agency Profile</h2>
                 <div className="flex items-center gap-4 mb-5">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FFF3EE] border border-[#FFD9C4]">
-                    <span className="text-xl font-black text-[#F97316]">A</span>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#FF6B35]/10 border border-[#FF6B35]/30">
+                    <span className="text-xl font-black text-[#FF6B35]">A</span>
                   </div>
                   <div>
                     <p className="text-[15px] font-bold">Agency</p>
-                    <p className="text-[12px] text-[#B5B5B5]">yappaflow.com</p>
+                    <p className="text-[12px] text-white/20">yappaflow.com</p>
                   </div>
-                  <button className="ml-auto rounded-lg border border-[#EFEFEF] px-3 py-1.5 text-[12px] font-semibold text-[#737373] hover:bg-[#F8F8F8]">
+                  <button className="ml-auto rounded-lg border border-white/[0.05] px-3 py-1.5 text-[12px] font-semibold text-white/30 hover:bg-white/[0.04]">
                     Edit
                   </button>
                 </div>
@@ -553,22 +553,22 @@ export function IntegrationsSettings() {
                     { label: "Email",       value: "agency@yappaflow.com" },
                     { label: "Phone",       value: "+90 555 000 00 00" },
                   ].map((f) => (
-                    <div key={f.label} className="flex items-center justify-between py-2 border-b border-[#F5F5F5] last:border-0">
-                      <span className="text-[12px] text-[#737373]">{f.label}</span>
-                      <span className="text-[12px] font-semibold text-[#0A0A0A]">{f.value}</span>
+                    <div key={f.label} className="flex items-center justify-between py-2 border-b border-white/[0.05] last:border-0">
+                      <span className="text-[12px] text-white/30">{f.label}</span>
+                      <span className="text-[12px] font-semibold text-white">{f.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-2xl bg-white border border-[#EFEFEF] p-5">
+              <div className="rounded-2xl bg-[#0c0c0f] border border-white/[0.05] p-5">
                 <h2 className="text-[14px] font-bold mb-3">Language</h2>
-                <div className="flex gap-2 rounded-xl border border-[#EFEFEF] bg-[#F8F8F8] p-1 w-fit">
+                <div className="flex gap-2 rounded-xl border border-white/[0.05] bg-white/[0.04] p-1 w-fit">
                   {(["tr", "en"] as const).map((l) => (
                     <button key={l} onClick={() => setLang(l)}
                       className={[
                         "rounded-lg px-5 py-2 text-[13px] font-semibold transition-all",
-                        lang === l ? "bg-white text-[#0A0A0A] shadow-sm border border-[#EFEFEF]" : "text-[#737373]",
+                        lang === l ? "bg-[#111114] text-white shadow-sm border border-white/[0.05]" : "text-white/30",
                       ].join(" ")}
                     >
                       {l === "tr" ? "🇹🇷 Türkçe" : "🇺🇸 English"}
@@ -582,7 +582,7 @@ export function IntegrationsSettings() {
           {section === "platforms" && <ConnectPlatforms />}
 
           {section === "api" && (
-            <div className="rounded-2xl bg-[#F8F8F8] border border-[#EFEFEF] p-5">
+            <div className="rounded-2xl bg-white/[0.04] border border-white/[0.05] p-5">
               <h2 className="text-[14px] font-bold mb-4">API Integrations</h2>
               <div className="grid grid-cols-1 gap-3">
                 {API_FIELDS.map((f) => (
@@ -593,20 +593,20 @@ export function IntegrationsSettings() {
           )}
 
           {section === "notif" && (
-            <div className="rounded-2xl bg-white border border-[#EFEFEF] overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#F5F5F5]">
+            <div className="rounded-2xl bg-[#0c0c0f] border border-white/[0.05] overflow-hidden">
+              <div className="px-5 py-4 border-b border-white/[0.05]">
                 <h2 className="text-[14px] font-bold">Notification Preferences</h2>
               </div>
               {PREFERENCES.map((pref, i) => (
                 <div key={pref.id}
                   className={[
                     "flex items-center justify-between px-5 py-4",
-                    i < PREFERENCES.length - 1 ? "border-b border-[#F5F5F5]" : "",
+                    i < PREFERENCES.length - 1 ? "border-b border-white/[0.05]" : "",
                   ].join(" ")}
                 >
                   <div>
-                    <p className="text-[13px] font-semibold text-[#0A0A0A]">{pref.label}</p>
-                    <p className="text-[11px] text-[#B5B5B5] mt-0.5">{pref.desc}</p>
+                    <p className="text-[13px] font-semibold text-white">{pref.label}</p>
+                    <p className="text-[11px] text-white/20 mt-0.5">{pref.desc}</p>
                   </div>
                   <Toggle
                     enabled={prefs[pref.id as keyof typeof prefs]}

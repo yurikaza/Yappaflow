@@ -7,6 +7,7 @@ import { CommandCenter }   from "@/components/dashboard/CommandCenter";
 import { EngineRoom }      from "@/components/dashboard/EngineRoom";
 import { DeploymentHub }   from "@/components/dashboard/DeploymentHub";
 import { IntegrationsSettings } from "@/components/dashboard/IntegrationsSettings";
+import { Solutions } from "@/components/dashboard/Solutions";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -19,8 +20,8 @@ export default function DashboardPage() {
   }, [router]);
 
   if (!ready) return (
-    <div className="flex h-screen items-center justify-center bg-[#F5F5F5]">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EFEFEF] border-t-[#F97316]" />
+    <div className="flex h-screen items-center justify-center bg-[#0A0A0A]">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/[0.06] border-t-[#FF6B35]" />
     </div>
   );
 
@@ -30,6 +31,7 @@ export default function DashboardPage() {
         if (view === "command")      return <CommandCenter setView={setView} setSignalId={setSignalId} />;
         if (view === "engine")       return <EngineRoom    setView={setView} signalId={signalId} />;
         if (view === "deploy")       return <DeploymentHub setView={setView} />;
+        if (view === "solutions")    return <Solutions />;
         if (view === "integrations") return <IntegrationsSettings />;
         return null;
       }}

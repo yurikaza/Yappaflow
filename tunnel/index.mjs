@@ -46,5 +46,6 @@ console.log(`    Verify token:  ${VERIFY_TOKEN}`);
 console.log("\n👉  Subscribe to field: messages\n");
 
 // Keep the process alive — ngrok closes when this exits
+setInterval(() => {}, 1000 * 60 * 60); // heartbeat to prevent event loop exit
 process.on("SIGINT",  () => ngrok.disconnect().then(() => process.exit(0)));
 process.on("SIGTERM", () => ngrok.disconnect().then(() => process.exit(0)));

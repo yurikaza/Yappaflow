@@ -31,6 +31,7 @@ export async function handleWhatsAppWebhook(entry: unknown[]): Promise<void> {
         metadata:  { phone_number_id: string; display_phone_number?: string };
         messages?: WAMessage[];
         contacts?: WAContact[];
+        statuses?: Array<{ id: string; status: string; timestamp: string; recipient_id: string }>;
       };
 
       const messages = val.messages ?? [];
@@ -40,6 +41,15 @@ export async function handleWhatsAppWebhook(entry: unknown[]): Promise<void> {
       const displayPhone     = displayPhoneRaw?.startsWith("+") ? displayPhoneRaw : `+${displayPhoneRaw ?? ""}`;
 
       log(`📨 WA Cloud API: phoneNumberId=${phoneNumberId}, displayPhone=${displayPhone}, messages=${messages.length}`);
+
+      // Log delivery status updates (sent/delivered/read receipts)
+      const statuses = val.statuses ?? [];
+      for (const s of statuses) {
+        log(`📬 WA status: message ${s.id} → ${s.status} (recipient: ${s.recipient_id})`);
+      }
+
+      // If no messages, this is just a status update — skip message processing
+      if (messages.length === 0) continue;
 
       // 1) Exact match by phoneNumberId (ideal — set during WABA onboarding)
       let conn = await PlatformConnection.findOne({ phoneNumberId, isActive: true });

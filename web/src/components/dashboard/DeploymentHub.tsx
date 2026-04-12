@@ -28,15 +28,15 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
             transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.5, ease: "easeOut" }}
             style={{ width: 72, height: 72, top: 0, left: 0 }} />
         ))}
-        <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-500 shadow-xl shadow-green-200">
+        <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-500 shadow-xl shadow-green-500/20">
           <Check size={32} strokeWidth={3} className="text-white" />
         </div>
       </div>
-      <h2 className="text-3xl font-black tracking-tight">Site is Live! 🎉</h2>
-      <p className="mt-2 text-[#737373]">Your project was deployed successfully</p>
-      <div className="mt-6 flex items-center gap-2 rounded-xl bg-green-50 border border-green-100 px-5 py-3">
-        <Globe size={14} className="text-green-600" />
-        <span className="text-[13px] font-semibold text-green-600">https://butikmode.com</span>
+      <h2 className="text-3xl font-black tracking-tight text-white">Site is Live! 🎉</h2>
+      <p className="mt-2 text-white/30">Your project was deployed successfully</p>
+      <div className="mt-6 flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 px-5 py-3">
+        <Globe size={14} className="text-green-400" />
+        <span className="text-[13px] font-semibold text-green-400">https://butikmode.com</span>
       </div>
       <div className="mt-5 flex gap-3">
         <button className="flex items-center gap-2 rounded-xl bg-[#0A0A0A] px-5 py-2.5 text-[13px] font-bold text-white hover:opacity-80 transition-opacity">
@@ -44,7 +44,7 @@ function SuccessScreen({ onBack }: { onBack: () => void }) {
           Open Live Site
         </button>
         <button onClick={onBack}
-          className="rounded-xl border border-[#EFEFEF] px-5 py-2.5 text-[13px] font-semibold text-[#737373] hover:bg-[#F8F8F8] transition-colors">
+          className="rounded-xl border border-white/[0.05] px-5 py-2.5 text-[13px] font-semibold text-white/30 hover:bg-white/[0.04] transition-colors">
           Back to Dashboard
         </button>
       </div>
@@ -79,13 +79,13 @@ export function DeploymentHub({ setView }: Props) {
       <div className="mb-6 flex items-center gap-3">
         {route && (
           <button onClick={() => setRoute(null)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#EFEFEF] bg-white hover:bg-[#F8F8F8] transition-colors">
-            <ChevronLeft size={16} className="text-[#737373]" />
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.05] bg-[#111114] hover:bg-white/[0.04] transition-colors">
+            <ChevronLeft size={16} className="text-white/30" />
           </button>
         )}
         <div>
-          <h1 className="text-2xl font-black tracking-tight">Deploy Hub</h1>
-          <p className="mt-0.5 text-[13px] text-[#737373]">
+          <h1 className="text-2xl font-black tracking-tight text-white">Deploy Hub</h1>
+          <p className="mt-0.5 text-[13px] text-white/30">
             {!route ? "Choose your deployment route" : route === "cms" ? "Select a CMS platform" : "Configure domain & hosting"}
           </p>
         </div>
@@ -97,16 +97,16 @@ export function DeploymentHub({ setView }: Props) {
           <motion.div key="routes" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
             <div className="grid grid-cols-2 gap-5 max-w-2xl">
               {[
-                { id: "cms" as Route,    label: "Deploy to CMS",   icon: Globe,  accent: "#4353FF", bg: "bg-blue-50",    desc: "Shopify, WordPress, Webflow or IKAS" },
-                { id: "custom" as Route, label: "Deploy Custom",   icon: Server, accent: "#F97316", bg: "bg-orange-50",  desc: "Domain via Namecheap + Hostinger server" },
+                { id: "cms" as Route,    label: "Deploy to CMS",   icon: Globe,  accent: "#4353FF", bg: "bg-blue-500/10",    desc: "Shopify, WordPress, Webflow or IKAS" },
+                { id: "custom" as Route, label: "Deploy Custom",   icon: Server, accent: "#FF6B35", bg: "bg-[#FF6B35]/10",  desc: "Domain via Namecheap + Hostinger server" },
               ].map(({ id, label, icon: Icon, accent, bg, desc }) => (
                 <button key={id!} onClick={() => setRoute(id)}
-                  className="group rounded-2xl bg-white border border-[#EFEFEF] p-7 text-left hover:border-[#D5D5D5] hover:shadow-sm transition-all">
+                  className="group rounded-2xl bg-[#111114] border border-white/[0.05] p-7 text-left hover:border-white/[0.08] hover:shadow-xl hover:shadow-black/20 transition-all">
                   <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${bg}`}>
                     <Icon size={24} style={{ color: accent }} />
                   </div>
-                  <h3 className="text-[16px] font-bold">{label}</h3>
-                  <p className="mt-1.5 text-[13px] text-[#737373]">{desc}</p>
+                  <h3 className="text-[16px] font-bold text-white">{label}</h3>
+                  <p className="mt-1.5 text-[13px] text-white/30">{desc}</p>
                   <div className="mt-5 flex items-center gap-1.5 text-[13px] font-bold" style={{ color: accent }}>
                     Select route <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
@@ -124,13 +124,13 @@ export function DeploymentHub({ setView }: Props) {
                 <button key={opt.id} onClick={() => setCms(opt.id)}
                   className={[
                     "relative rounded-xl border p-5 text-left transition-all",
-                    cms === opt.id ? "border-2 shadow-sm" : "border-[#EFEFEF] bg-white hover:border-[#D5D5D5]",
+                    cms === opt.id ? "border-2 shadow-xl shadow-black/20" : "border-white/[0.05] bg-[#111114] hover:border-white/[0.08]",
                   ].join(" ")}
                   style={cms === opt.id ? { borderColor: opt.color, backgroundColor: `${opt.color}08` } : {}}
                 >
                   <div className="mb-3 h-2 w-2 rounded-full" style={{ backgroundColor: opt.color }} />
                   <p className="text-[14px] font-bold" style={cms === opt.id ? { color: opt.color } : {}}>{opt.label}</p>
-                  <p className="mt-1 text-[11px] text-[#B5B5B5]">{opt.desc}</p>
+                  <p className="mt-1 text-[11px] text-white/20">{opt.desc}</p>
                   {cms === opt.id && (
                     <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: opt.color }}>
                       <Check size={11} strokeWidth={3} className="text-white" />
@@ -141,7 +141,7 @@ export function DeploymentHub({ setView }: Props) {
             </div>
             {cms && (
               <motion.button initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} onClick={startDeploy}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-bold text-white hover:opacity-80 transition-opacity shadow-sm">
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-[13px] font-bold text-[#0A0A0A] hover:opacity-80 transition-opacity shadow-xl shadow-black/20">
                 <Sparkles size={15} />
                 Deploy to {CMS_OPTIONS.find((c) => c.id === cms)?.label}
               </motion.button>
@@ -158,33 +158,33 @@ export function DeploymentHub({ setView }: Props) {
                   step: 1, title: "Domain Search — Namecheap",
                   content: (
                     <div>
-                      <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5">
-                        <span className="text-[12px] text-[#B5B5B5]">https://</span>
+                      <div className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/10 px-3 py-2.5">
+                        <span className="text-[12px] text-white/20">https://</span>
                         <span className="flex-1 text-[13px] font-mono font-semibold">butikmode.com</span>
                         <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
                           <Check size={11} strokeWidth={3} className="text-white" />
                         </div>
                       </div>
-                      <p className="mt-1.5 text-[11px] text-green-600 font-semibold">✓ Available — $10.98/yr</p>
+                      <p className="mt-1.5 text-[11px] text-green-400 font-semibold">✓ Available — $10.98/yr</p>
                     </div>
                   ),
                 },
                 {
                   step: 2, title: "Server — Hostinger",
                   content: (
-                    <div className="flex items-center justify-between rounded-lg border border-[#EFEFEF] bg-white px-4 py-3">
+                    <div className="flex items-center justify-between rounded-lg border border-white/[0.05] bg-[#111114] px-4 py-3">
                       <div>
-                        <p className="text-[13px] font-bold">Business Plan</p>
-                        <p className="text-[11px] text-[#B5B5B5] mt-0.5">4 GB RAM · 200 GB SSD · Auto SSL</p>
+                        <p className="text-[13px] font-bold text-white">Business Plan</p>
+                        <p className="text-[11px] text-white/20 mt-0.5">4 GB RAM · 200 GB SSD · Auto SSL</p>
                       </div>
-                      <span className="text-[16px] font-black text-[#F97316]">$3.99<span className="text-[11px] font-medium text-[#B5B5B5]">/mo</span></span>
+                      <span className="text-[16px] font-black text-[#FF6B35]">$3.99<span className="text-[11px] font-medium text-white/20">/mo</span></span>
                     </div>
                   ),
                 },
               ].map(({ step, title, content }) => (
                 <div key={step} className="flex gap-4">
-                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FFF3EE] border border-[#FFD9C4]">
-                    <span className="text-[11px] font-black text-[#F97316]">{step}</span>
+                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#FF6B35]/10 border border-[#FF6B35]/30">
+                    <span className="text-[11px] font-black text-[#FF6B35]">{step}</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-semibold mb-2">{title}</p>
@@ -194,7 +194,7 @@ export function DeploymentHub({ setView }: Props) {
               ))}
             </div>
             <button onClick={startDeploy}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0A0A0A] py-3 text-[13px] font-bold text-white hover:opacity-80 transition-opacity shadow-sm">
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-[13px] font-bold text-[#0A0A0A] hover:opacity-80 transition-opacity shadow-xl shadow-black/20">
               <Sparkles size={15} />
               Confirm & Deploy
             </button>
@@ -204,20 +204,20 @@ export function DeploymentHub({ setView }: Props) {
         {/* Deploying */}
         {deploying && !success && (
           <motion.div key="deploying" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-sm mx-auto mt-10 text-center">
-            <p className="text-[18px] font-black mb-1">Deploying your site...</p>
-            <p className="text-[13px] text-[#737373] mb-8">Usually takes under 30 seconds</p>
-            <div className="h-1.5 w-full rounded-full bg-[#EFEFEF] mb-6 overflow-hidden">
-              <motion.div className="h-1.5 rounded-full bg-[#F97316]" style={{ width: `${progress}%` }} />
+            <p className="text-[18px] font-black mb-1 text-white">Deploying your site...</p>
+            <p className="text-[13px] text-white/30 mb-8">Usually takes under 30 seconds</p>
+            <div className="h-1.5 w-full rounded-full bg-white/[0.06] mb-6 overflow-hidden">
+              <motion.div className="h-1.5 rounded-full bg-[#FF6B35]" style={{ width: `${progress}%` }} />
             </div>
             <div className="space-y-3 text-left">
               {DEPLOY_STEPS.map((step, i) => {
                 const done = progress > (i + 1) * 25;
                 return (
                   <div key={step} className="flex items-center gap-3">
-                    <div className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all ${done ? "bg-green-500" : "bg-[#EFEFEF]"}`}>
+                    <div className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all ${done ? "bg-green-500" : "bg-white/[0.06]"}`}>
                       {done && <Check size={11} strokeWidth={3} className="text-white" />}
                     </div>
-                    <span className={`text-[13px] transition-colors ${done ? "text-[#0A0A0A] font-medium" : "text-[#B5B5B5]"}`}>{step}</span>
+                    <span className={`text-[13px] transition-colors ${done ? "text-white font-medium" : "text-white/20"}`}>{step}</span>
                   </div>
                 );
               })}
