@@ -104,7 +104,7 @@ export const platformResolvers = {
     /** Connect WhatsApp Business via Embedded Signup (one-click OAuth popup) */
     connectWhatsAppEmbedded: async (
       _: unknown,
-      { input }: { input: { code: string; wabaId?: string; phoneNumberId?: string } },
+      { input }: { input: { code: string; wabaId?: string; phoneNumberId?: string; redirectUri?: string } },
       ctx: AuthContext
     ) => {
       if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
@@ -125,6 +125,7 @@ export const platformResolvers = {
               client_id:     env.metaAppId,
               client_secret: env.metaAppSecret,
               code:          input.code,
+              redirect_uri:  input.redirectUri || env.frontendUrl,
             },
           }
         );

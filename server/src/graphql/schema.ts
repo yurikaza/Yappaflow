@@ -167,6 +167,7 @@ export const typeDefs = `#graphql
     code: String!
     wabaId: String
     phoneNumberId: String
+    redirectUri: String
   }
 
   # ── Chat messages ──────────────────────────────────────────────
