@@ -156,7 +156,7 @@ export async function handleDebugWebhook(
   const text       = body.message  ?? "Test message from debug endpoint";
 
   // If agencyId provided, use it directly; otherwise find first active WA connection
-  let agencyId = body.agencyId;
+  let agencyId: string = body.agencyId ?? "";
   if (!agencyId) {
     const conn = await PlatformConnection.findOne({
       platform: { $in: ["whatsapp", "whatsapp_business"] },
