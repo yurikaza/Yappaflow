@@ -117,7 +117,7 @@ export async function connectWhatsApp(input: { accessToken: string }, token: str
 }
 
 export async function connectWhatsAppEmbedded(
-  input: { code: string; wabaId: string; phoneNumberId: string },
+  input: { code: string; wabaId?: string; phoneNumberId?: string },
   token: string
 ) {
   return gql(

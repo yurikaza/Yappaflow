@@ -165,8 +165,8 @@ export const typeDefs = `#graphql
 
   input ConnectWhatsAppEmbeddedInput {
     code: String!
-    wabaId: String!
-    phoneNumberId: String!
+    wabaId: String
+    phoneNumberId: String
   }
 
   # ── Chat messages ──────────────────────────────────────────────

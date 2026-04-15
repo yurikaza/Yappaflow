@@ -379,22 +379,16 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
 
         // FB.login requires a sync callback — run async work inside an IIFE
         (async () => {
-          let retries = 0;
-          while (!embeddedDataRef.current && retries < 10) {
-            await new Promise((r) => setTimeout(r, 200));
-            retries++;
-          }
-
+          // Use postMessage data if available (best case), otherwise server auto-discovers
           const embedded = embeddedDataRef.current;
-          if (!embedded?.waba_id || !embedded?.phone_number_id) {
-            setLoading(false);
-            setErr("Could not receive data from Meta. Please disable your ad blocker, allow pop-ups for this site, and try again.");
-            return;
-          }
 
           try {
             await connectWhatsAppEmbedded(
-              { code, wabaId: embedded.waba_id, phoneNumberId: embedded.phone_number_id },
+              {
+                code,
+                ...(embedded?.waba_id ? { wabaId: embedded.waba_id } : {}),
+                ...(embedded?.phone_number_id ? { phoneNumberId: embedded.phone_number_id } : {}),
+              },
               token
             );
             setConnected(true);

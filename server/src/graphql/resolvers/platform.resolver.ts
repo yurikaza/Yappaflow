@@ -104,7 +104,7 @@ export const platformResolvers = {
     /** Connect WhatsApp Business via Embedded Signup (one-click OAuth popup) */
     connectWhatsAppEmbedded: async (
       _: unknown,
-      { input }: { input: { code: string; wabaId: string; phoneNumberId: string } },
+      { input }: { input: { code: string; wabaId?: string; phoneNumberId?: string } },
       ctx: AuthContext
     ) => {
       if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
@@ -130,7 +130,7 @@ export const platformResolvers = {
         );
         accessToken = data.access_token;
         if (!accessToken) throw new Error("No access_token in response");
-        log(`✅ Embedded Signup: token exchanged for WABA ${input.wabaId}`);
+        log(`✅ Embedded Signup: token exchanged successfully`);
       } catch (err: unknown) {
         const msg = (err as { response?: { data?: { error?: { message?: string } } } })
           ?.response?.data?.error?.message
@@ -141,20 +141,48 @@ export const platformResolvers = {
         });
       }
 
-      // 2. Fetch display phone number for the connected number
+      // 2. Resolve wabaId and phoneNumberId — use provided values or auto-discover from token
+      let wabaId = input.wabaId;
+      let phoneNumberId = input.phoneNumberId;
       let displayPhone = "";
-      try {
-        const { data } = await axios.get(
-          `https://graph.facebook.com/v21.0/${input.phoneNumberId}`,
-          {
-            params: { fields: "display_phone_number", access_token: accessToken },
-          }
-        );
-        displayPhone = data.display_phone_number ?? "";
-        log(`📱 Embedded Signup: phone number ${displayPhone} (ID: ${input.phoneNumberId})`);
-      } catch {
-        // Non-fatal — we can still store the connection without display phone
-        log(`⚠️  Could not fetch display phone for ${input.phoneNumberId}`);
+
+      if (!wabaId || !phoneNumberId) {
+        try {
+          // Auto-discover WABA from the token
+          const { data: wabaRes } = await axios.get(
+            "https://graph.facebook.com/v21.0/me/whatsapp_business_accounts",
+            { params: { access_token: accessToken } }
+          );
+          const waba = wabaRes.data?.[0];
+          if (!waba?.id) throw new Error("No WhatsApp Business Account found on this token");
+          wabaId = waba.id;
+
+          // Auto-discover phone numbers under the WABA
+          const { data: phoneRes } = await axios.get(
+            `https://graph.facebook.com/v21.0/${wabaId}/phone_numbers`,
+            { params: { fields: "id,display_phone_number", access_token: accessToken } }
+          );
+          const phone = phoneRes.data?.[0];
+          if (!phone?.id) throw new Error("No phone numbers found under this WhatsApp Business Account");
+          phoneNumberId = phone.id;
+          displayPhone = phone.display_phone_number ?? "";
+          log(`📱 Embedded Signup: auto-discovered WABA ${wabaId}, phone ${displayPhone} (${phoneNumberId})`);
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Could not discover WhatsApp Business Account";
+          throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
+        }
+      } else {
+        // wabaId and phoneNumberId provided — just fetch display phone
+        try {
+          const { data } = await axios.get(
+            `https://graph.facebook.com/v21.0/${phoneNumberId}`,
+            { params: { fields: "display_phone_number", access_token: accessToken } }
+          );
+          displayPhone = data.display_phone_number ?? "";
+          log(`📱 Embedded Signup: phone number ${displayPhone} (ID: ${phoneNumberId})`);
+        } catch {
+          log(`⚠️  Could not fetch display phone for ${phoneNumberId}`);
+        }
       }
 
       // 3. Upsert PlatformConnection
@@ -164,8 +192,8 @@ export const platformResolvers = {
           $set: {
             userId:        ctx.userId,
             platform:      "whatsapp_business",
-            wabaId:        input.wabaId,
-            phoneNumberId: input.phoneNumberId,
+            wabaId,
+            phoneNumberId,
             displayPhone,
             accessToken,
             isActive:      true,
@@ -175,18 +203,16 @@ export const platformResolvers = {
       );
 
       // 4. Subscribe this WABA to receive webhook events
-      //    Without this, Meta won't forward messages to our /webhook endpoint
       try {
         await axios.post(
-          `https://graph.facebook.com/v21.0/${input.wabaId}/subscribed_apps`,
+          `https://graph.facebook.com/v21.0/${wabaId}/subscribed_apps`,
           {},
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
-        log(`📡 Embedded Signup: WABA ${input.wabaId} subscribed to webhooks`);
+        log(`📡 Embedded Signup: WABA ${wabaId} subscribed to webhooks`);
       } catch (err: unknown) {
-        // Non-fatal — connection is saved, webhook subscription can be retried
         logError("Webhook subscription failed (non-fatal)", err);
-        log(`⚠️  Webhook subscription failed for WABA ${input.wabaId}. Messages may not arrive until subscribed.`);
+        log(`⚠️  Webhook subscription failed for WABA ${wabaId}. Messages may not arrive until subscribed.`);
       }
 
       return serializeConn(doc);
