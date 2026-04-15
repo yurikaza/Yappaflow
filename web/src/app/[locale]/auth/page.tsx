@@ -386,7 +386,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
             await connectWhatsAppEmbedded(
               {
                 code,
-                redirectUri: window.location.origin,
+                redirectUri: "",
                 ...(embedded?.waba_id ? { wabaId: embedded.waba_id } : {}),
                 ...(embedded?.phone_number_id ? { phoneNumberId: embedded.phone_number_id } : {}),
               },
