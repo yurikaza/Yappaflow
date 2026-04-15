@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useCallback } from "react";
 
+// SSE must connect directly to the API server (not via Next.js rewrite proxy)
+// because Netlify/Vercel serverless functions have timeouts that kill long-lived connections.
 let _apiBase: string | null = null;
 function getApiBase(): string {
   if (_apiBase !== null) return _apiBase;
   const direct = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-  if (typeof window === "undefined") return direct;
-  const host = window.location.hostname;
-  _apiBase = (host === "localhost" || host === "127.0.0.1") ? direct : "/api";
+  _apiBase = direct;
   return _apiBase;
 }
 

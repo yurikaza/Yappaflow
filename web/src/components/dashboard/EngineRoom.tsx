@@ -6,10 +6,8 @@ import {
   MessageCircle, Instagram, Send, X, Loader2, Lock, ChevronRight, Zap,
 } from "lucide-react";
 import type { DashboardView } from "./DashboardShell";
-import { getChatMessages, sendMessage, type ChatMessage, type Signal } from "@/lib/dashboard-api";
+import { getChatMessages, sendMessage, getSignals, type ChatMessage, type Signal } from "@/lib/dashboard-api";
 import { useRealtimeSignals, type RealtimeSignalEvent } from "@/lib/hooks/useRealtimeSignals";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface Props {
   setView:  (v: DashboardView) => void;
@@ -87,16 +85,9 @@ export function EngineRoom({ setView, signalId }: Props) {
   // Fetch signal info for header
   useEffect(() => {
     if (!signalId) return;
-    const token = localStorage.getItem("yappaflow_token");
-    if (!token) return;
-    fetch(`${API_URL}/graphql`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ query: `query { signals { id platform senderName sender preview status } }` }),
-    })
-      .then((r) => r.json())
-      .then((json) => {
-        const found = (json.data?.signals ?? []).find((s: Signal) => s.id === signalId);
+    getSignals()
+      .then((signals) => {
+        const found = signals.find((s) => s.id === signalId);
         if (found) setSignal(found);
       })
       .catch(() => null);
