@@ -45,26 +45,67 @@ export const platformResolvers = {
     ) => {
       if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
 
-      let wabaId: string, phoneNumberId: string, displayPhone: string;
+      let wabaId: string | undefined, phoneNumberId: string, displayPhone: string;
       try {
-        // 1. Discover WABA via debug_token
         const appToken = `${env.metaAppId}|${env.metaAppSecret}`;
-        const { data: debugData } = await axios.get(
-          "https://graph.facebook.com/v21.0/debug_token",
-          { params: { input_token: input.accessToken, access_token: appToken } }
-        );
-        const granularScopes = debugData.data?.granular_scopes ?? [];
-        const wabaScope = granularScopes.find(
-          (s: { scope: string; target_ids?: string[] }) => s.scope === "whatsapp_business_management"
-        );
-        wabaId = wabaScope?.target_ids?.[0];
-        if (!wabaId) {
-          log("debug_token granular_scopes: " + JSON.stringify(granularScopes));
-          throw new Error("No WhatsApp Business Account found on this token. Make sure the token has whatsapp_business_management permission with a WABA assigned.");
-        }
-        log(`WA: discovered WABA ${wabaId} via debug_token`);
 
-        // 2. Get phone numbers under the WABA
+        // Strategy 1: debug_token granular_scopes (works for Embedded Signup tokens)
+        try {
+          const { data: debugData } = await axios.get(
+            "https://graph.facebook.com/v21.0/debug_token",
+            { params: { input_token: input.accessToken, access_token: appToken } }
+          );
+          const granularScopes = debugData.data?.granular_scopes ?? [];
+          const wabaScope = granularScopes.find(
+            (s: { scope: string; target_ids?: string[] }) => s.scope === "whatsapp_business_management"
+          );
+          wabaId = wabaScope?.target_ids?.[0];
+          if (wabaId) log(`WA: discovered WABA ${wabaId} via debug_token`);
+          else log("WA: debug_token has no target_ids, trying business discovery. scopes: " + JSON.stringify(granularScopes));
+        } catch (e) {
+          log("WA: debug_token failed, trying business discovery");
+        }
+
+        // Strategy 2: business discovery (works for System User tokens)
+        if (!wabaId) {
+          try {
+            const { data: bizRes } = await axios.get(
+              "https://graph.facebook.com/v21.0/me/businesses",
+              { params: { access_token: input.accessToken } }
+            );
+            const bizId = bizRes.data?.[0]?.id;
+            if (bizId) {
+              const { data: wabaRes } = await axios.get(
+                `https://graph.facebook.com/v21.0/${bizId}/owned_whatsapp_business_accounts`,
+                { params: { access_token: input.accessToken } }
+              );
+              wabaId = wabaRes.data?.[0]?.id;
+              if (wabaId) log(`WA: discovered WABA ${wabaId} via business ${bizId}`);
+            }
+          } catch (e) {
+            log("WA: business discovery failed, trying direct WABA listing");
+          }
+        }
+
+        // Strategy 3: direct listing (might work for some token types)
+        if (!wabaId) {
+          try {
+            const { data: wabaRes } = await axios.get(
+              "https://graph.facebook.com/v21.0/me/whatsapp_business_accounts",
+              { params: { access_token: input.accessToken } }
+            );
+            wabaId = wabaRes.data?.[0]?.id;
+            if (wabaId) log(`WA: discovered WABA ${wabaId} via direct listing`);
+          } catch {
+            // Expected to fail for most token types
+          }
+        }
+
+        if (!wabaId) {
+          throw new Error("Could not find a WhatsApp Business Account. Make sure your System User has the WABA assigned as an asset with Full Control.");
+        }
+
+        // Get phone numbers under the WABA
         const { data: phoneRes } = await axios.get(
           `https://graph.facebook.com/v21.0/${wabaId}/phone_numbers`,
           { params: { fields: "id,display_phone_number", access_token: input.accessToken } }
