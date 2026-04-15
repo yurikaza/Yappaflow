@@ -125,8 +125,8 @@ export const platformResolvers = {
               client_id:     env.metaAppId,
               client_secret: env.metaAppSecret,
               code:          input.code,
-              // No redirect_uri for JS SDK popup flows — omitting matches what FB.login uses
-              ...(input.redirectUri ? { redirect_uri: input.redirectUri } : {}),
+              // FB.login with response_type:"code" uses this exact redirect_uri internally
+              redirect_uri: "https://www.facebook.com/connect/login_success.html",
             },
           }
         );
