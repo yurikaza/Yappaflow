@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 
 const FEATURES = [
@@ -21,7 +21,7 @@ function FanCard({ num, title, index, progress }: {
   num: string;
   title: string;
   index: number;
-  progress: ReturnType<typeof useTransform>;
+  progress: MotionValue<number>;
 }) {
   // Each card fans out from a stacked position to its final position
   const fanX = useTransform(progress, [0, 0.5, 1], [0, index * 25, index * 25]);

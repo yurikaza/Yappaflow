@@ -184,7 +184,6 @@ function AddProjectModal({ signals, onClose, onAdd }: { signals: Signal[]; onClo
 // ── Contact Picker API (mobile/modern browsers) ────────────────────────────────
 async function pickFromDeviceContacts(): Promise<{ name: string; phone: string } | null> {
   try {
-    // @ts-expect-error — Contact Picker API not in all TS libs yet
     if (!("contacts" in navigator && "ContactsManager" in window)) return null;
     // @ts-expect-error
     const results = await navigator.contacts.select(["name", "tel"], { multiple: false });
@@ -217,7 +216,6 @@ function StartConversationModal({
   const [hasContactApi, setHasContactApi] = useState(false);
 
   useEffect(() => {
-    // @ts-expect-error
     setHasContactApi("contacts" in navigator && "ContactsManager" in window);
   }, []);
 

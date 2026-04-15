@@ -7,6 +7,12 @@
       "runtimeArgs": [".claude/start-web.sh"],
       "port": 3000,
       "autoPort": false
+    },
+    {
+      "name": "creative-agency",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "sites/creative-agency"],
+      "port": 3001
     }
   ]
 }

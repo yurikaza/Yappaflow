@@ -8,8 +8,8 @@ const LINKS = [
   { label: "X", href: "#" },
   { label: "LinkedIn", href: "#" },
   { label: "Contact", href: "#" },
-  { label: "Privacy", href: "#" },
-  { label: "Terms", href: "#" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
 ];
 
 export function Footer() {
