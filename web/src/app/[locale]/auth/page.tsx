@@ -374,7 +374,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
 
     window.FB.login(
       (response) => {
-        const accessToken = response.authResponse?.access_token;
+        const accessToken = response.authResponse?.accessToken;
         if (!accessToken) { setLoading(false); setErr("Authorization cancelled. Please try again."); return; }
 
         // FB.login requires a sync callback — run async work inside an IIFE
