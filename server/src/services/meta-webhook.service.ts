@@ -38,7 +38,9 @@ export async function handleWhatsAppWebhook(entry: unknown[]): Promise<void> {
       const contacts  = val.contacts ?? [];
       const phoneNumberId    = val.metadata?.phone_number_id;
       const displayPhoneRaw  = val.metadata?.display_phone_number; // e.g. "905455876255"
-      const displayPhone     = displayPhoneRaw?.startsWith("+") ? displayPhoneRaw : `+${displayPhoneRaw ?? ""}`;
+      const displayPhone     = displayPhoneRaw ? normalizePhone(displayPhoneRaw) : "";
+      // Also keep the raw digits without + for matching stored values
+      const displayPhoneDigits = displayPhoneRaw?.replace(/[^\d]/g, "") ?? "";
 
       log(`📨 WA Cloud API: phoneNumberId=${phoneNumberId}, displayPhone=${displayPhone}, messages=${messages.length}`);
 
@@ -54,10 +56,14 @@ export async function handleWhatsAppWebhook(entry: unknown[]): Promise<void> {
       // 1) Exact match by phoneNumberId (ideal — set during WABA onboarding)
       let conn = await PlatformConnection.findOne({ phoneNumberId, isActive: true });
 
-      // 2) Fallback: match by displayPhone (set during WhatsApp OTP login)
+      // 2) Fallback: match by displayPhone (set during WhatsApp OTP login or WABA connect)
+      //    Try multiple format variations since phone can be stored as +905551234567,
+      //    905551234567, or with spaces/dashes
       if (!conn && displayPhoneRaw) {
+        const phoneVariants = [displayPhone, displayPhoneRaw, displayPhoneDigits, `+${displayPhoneDigits}`]
+          .filter((v, i, a) => v && a.indexOf(v) === i); // unique non-empty
         conn = await PlatformConnection.findOne({
-          displayPhone: { $in: [displayPhone, displayPhoneRaw] },
+          displayPhone: { $in: phoneVariants },
           platform: { $in: ["whatsapp", "whatsapp_business"] },
           isActive: true,
         });
@@ -225,6 +231,13 @@ export async function handleInstagramWebhook(entry: unknown[]): Promise<void> {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
+
+/** Strip all non-digit chars except leading + for phone comparison */
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/[^\d+]/g, "");
+  return digits.startsWith("+") ? digits : `+${digits}`;
+}
+
 function extractWAText(msg: WAMessage): string {
   if (msg.text)     return msg.text.body;
   if (msg.image)    return "[image]";

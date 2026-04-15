@@ -498,8 +498,11 @@ export function CommandCenter({ setView, setSignalId }: Props) {
   };
 
   const dashboardSignals = signals.filter((s) => s.isOnDashboard);
-  const waConnected = platforms.some((p) => p.platform === "whatsapp_business" || p.platform === "whatsapp");
-  const igConnected = platforms.some((p) => p.platform === "instagram_dm"      || p.platform === "instagram");
+  // whatsapp_business = fully connected via Meta API (can receive webhooks + send messages)
+  // whatsapp = login-only connection (just phone number, no Meta API access)
+  const waConnected       = platforms.some((p) => p.platform === "whatsapp_business");
+  const waLoginOnly       = !waConnected && platforms.some((p) => p.platform === "whatsapp");
+  const igConnected       = platforms.some((p) => p.platform === "instagram_dm" || p.platform === "instagram");
 
   const STAT_CARDS = [
     { label: "Total Signals",    value: stats?.totalSignals      ?? "—", sub: "All incoming",       dark: true  },
@@ -588,6 +591,27 @@ export function CommandCenter({ setView, setSignalId }: Props) {
             </motion.div>
           ))}
         </div>
+
+        {/* Setup banner: logged in with WhatsApp but haven't connected Business API */}
+        {waLoginOnly && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="mb-5 rounded-2xl border border-[#FF6B35]/20 bg-[#FF6B35]/5 p-5 flex items-center gap-4">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#FF6B35]/10">
+              <MessageCircle size={22} className="text-[#FF6B35]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[14px] font-bold text-white">Connect WhatsApp Business to receive messages</p>
+              <p className="mt-0.5 text-[12px] text-white/40 leading-relaxed">
+                You signed in with your phone number, but to receive customer messages you need to connect your WhatsApp Business API.
+              </p>
+            </div>
+            <button onClick={() => setView("integrations")}
+              className="flex-shrink-0 flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2.5 text-[13px] font-bold text-white hover:opacity-90 transition-opacity">
+              <Zap size={13} />
+              Connect Now
+            </button>
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-3 gap-4">
           {/* Signals panel */}
