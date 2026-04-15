@@ -411,8 +411,12 @@ function ConnectPlatforms() {
 
   useEffect(() => { load(); }, [load]);
 
-  const isWAConnected = connections.some((c) => c.platform === "whatsapp" || c.platform === "whatsapp_business");
+  // Only whatsapp_business counts as "connected" — plain "whatsapp" is just login phone tracking
+  const isWAConnected = connections.some((c) => c.platform === "whatsapp_business");
   const isIGConnected = connections.some((c) => c.platform === "instagram" || c.platform === "instagram_dm");
+
+  // Filter out login-only "whatsapp" connections — they're not real platform integrations
+  const visibleConnections = connections.filter((c) => c.platform !== "whatsapp");
 
   const PLATFORMS = [
     {
@@ -447,8 +451,8 @@ function ConnectPlatforms() {
           </div>
         ) : (
           <div className="space-y-3">
-            {/* Active connections */}
-            {connections.map((conn) => (
+            {/* Active connections (excludes login-only "whatsapp") */}
+            {visibleConnections.map((conn) => (
               <ConnectedCard key={conn.id} conn={conn} onDisconnect={load} />
             ))}
 
