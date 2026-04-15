@@ -333,11 +333,11 @@ export default function AuthPage() {
 // ── WhatsApp Business Connect Step (shown after OTP verification) ────────────
 
 function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => void }) {
-  const { ready, error: sdkError } = useFacebookSDK(process.env.NEXT_PUBLIC_META_APP_ID);
+  const { ready } = useFacebookSDK(process.env.NEXT_PUBLIC_META_APP_ID);
   const [loading, setLoading]      = useState(false);
   const [err, setErr]              = useState("");
   const [connected, setConnected]  = useState(false);
-  const [showManual, setShowManual] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [manualToken, setManualToken] = useState("");
   const [showToken, setShowToken]  = useState(false);
 
@@ -362,10 +362,11 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
     return () => window.removeEventListener("message", handler);
   }, []);
 
-  const handleEmbeddedSignup = () => {
+  const handleContinueWithMeta = () => {
     const configId = process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID;
     if (!configId || !window.FB) {
-      setShowManual(true);
+      setErr("Meta integration is being set up. Please use the developer option below or try again later.");
+      setShowAdvanced(true);
       return;
     }
     setErr(""); setLoading(true);
@@ -374,7 +375,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
     window.FB.login(
       async (response) => {
         const code = response.authResponse?.code;
-        if (!code) { setLoading(false); setErr("Authorization cancelled."); return; }
+        if (!code) { setLoading(false); setErr("Authorization cancelled. Please try again."); return; }
 
         let retries = 0;
         while (!embeddedDataRef.current && retries < 10) {
@@ -385,8 +386,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
         const embedded = embeddedDataRef.current;
         if (!embedded?.waba_id || !embedded?.phone_number_id) {
           setLoading(false);
-          setErr("WhatsApp data not received. Try the manual method below.");
-          setShowManual(true);
+          setErr("Could not complete setup. Please try again.");
           return;
         }
 
@@ -398,8 +398,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
           setConnected(true);
           setTimeout(onDone, 1500);
         } catch (e: unknown) {
-          setErr(e instanceof Error ? e.message : "Connection failed");
-          setShowManual(true);
+          setErr(e instanceof Error ? e.message : "Connection failed. Please try again.");
         } finally { setLoading(false); }
       },
       {
@@ -412,7 +411,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
   };
 
   const handleManualConnect = async () => {
-    if (!manualToken) { setErr("Paste your WhatsApp Business System User token"); return; }
+    if (!manualToken) { setErr("Please paste your access token"); return; }
     setLoading(true); setErr("");
     try {
       await connectWhatsApp({ accessToken: manualToken }, token);
@@ -423,111 +422,117 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
     } finally { setLoading(false); }
   };
 
-  const hasConfigId = !!process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID;
+  // ── Success state ──
+  if (connected) {
+    return (
+      <motion.div key="wa_connect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        className="bg-[#0c0c0f] border border-white/[0.06] rounded-xl p-8">
+        <div className="flex flex-col items-center text-center py-4">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366]/10 border-2 border-[#25D366]/30 mb-4">
+            <Check size={32} className="text-[#25D366]" />
+          </div>
+          <h2 className="text-xl font-bold text-white">You&apos;re all set!</h2>
+          <p className="mt-2 text-sm text-white/30">WhatsApp Business connected. Redirecting to your dashboard...</p>
+        </div>
+      </motion.div>
+    );
+  }
 
+  // ── Connect state ──
   return (
     <motion.div key="wa_connect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
       className="bg-[#0c0c0f] border border-white/[0.06] rounded-xl p-8">
 
-      {connected ? (
-        <div className="flex flex-col items-center text-center py-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366]/10 border border-[#25D366]/30 mb-4">
-            <Check size={28} className="text-[#25D366]" />
-          </div>
-          <h2 className="text-xl font-bold text-white">WhatsApp Connected!</h2>
-          <p className="mt-2 text-sm text-white/30">Redirecting to your dashboard...</p>
-        </div>
-      ) : (
-        <>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#25D366] text-white">
-              <Zap size={20} />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">Connect your business</h2>
-              <p className="text-sm text-white/30">Receive customer messages in your dashboard</p>
-            </div>
-          </div>
+      {/* Step indicator */}
+      <div className="flex items-center gap-2 mb-6">
+        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366] text-white text-[11px] font-bold">2</div>
+        <span className="text-[11px] font-semibold text-white/30 uppercase tracking-wide">Last step</span>
+      </div>
 
-          <div className="mt-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-4">
-            <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-[#25D366]/10 mt-0.5">
-                <MessageCircle size={15} className="text-[#25D366]" />
-              </div>
-              <div>
-                <p className="text-[13px] font-semibold text-white">WhatsApp Business API</p>
-                <p className="text-[11px] text-white/30 mt-0.5 leading-relaxed">
-                  This connects your WhatsApp Business number so customers can message you and you&apos;ll see everything in your dashboard.
-                </p>
-              </div>
-            </div>
-          </div>
+      <h2 className="text-xl font-bold text-white">Connect WhatsApp Business</h2>
+      <p className="mt-2 text-sm text-white/30 leading-relaxed">
+        Allow Yappaflow to receive messages from your WhatsApp Business account.
+        A Meta popup will open — just select your business and confirm.
+      </p>
 
-          <div className="mt-5 space-y-3">
-            {/* One-click Embedded Signup */}
-            {hasConfigId && (
-              <button
-                onClick={handleEmbeddedSignup}
-                disabled={loading || !ready}
-                className="w-full bg-[#25D366] text-white py-3 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition-all text-sm flex items-center justify-center gap-2"
-              >
-                {loading ? (
-                  <><Loader2 size={14} className="animate-spin" /> Connecting...</>
-                ) : (
-                  <><MessageCircle size={16} /> Connect WhatsApp Business</>
-                )}
+      {/* What happens */}
+      <div className="mt-5 space-y-2">
+        {[
+          "Meta will ask you to grant Yappaflow permission",
+          "Select your WhatsApp Business account & phone number",
+          "Customer messages will appear in your dashboard instantly",
+        ].map((text, i) => (
+          <div key={i} className="flex items-start gap-2.5">
+            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366]/10 mt-0.5">
+              <Check size={10} className="text-[#25D366]" />
+            </div>
+            <p className="text-[12px] text-white/40">{text}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Primary CTA: Continue with Meta */}
+      <button
+        onClick={handleContinueWithMeta}
+        disabled={loading || !ready}
+        className="mt-6 w-full flex items-center justify-center gap-3 rounded-lg py-3.5 font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 text-sm"
+        style={{ background: "linear-gradient(135deg, #0078FF, #00C6FF)" }}
+      >
+        {loading ? (
+          <><Loader2 size={16} className="animate-spin" /> Connecting to Meta...</>
+        ) : (
+          <>
+            {/* Meta logo */}
+            <svg width="20" height="20" viewBox="0 0 36 36" fill="currentColor">
+              <path d="M18 2.1C9.2 2.1 2.1 9.2 2.1 18c0 4.9 2.2 9.3 5.7 12.2V36l5.6-3.1c1.5.4 3 .6 4.6.6 8.8 0 15.9-7.1 15.9-15.9S26.8 2.1 18 2.1z"/>
+            </svg>
+            Continue with Meta
+          </>
+        )}
+      </button>
+
+      {err && <p className="mt-3 text-sm text-red-400 text-center">{err}</p>}
+
+      {/* Developer fallback — hidden by default */}
+      <div className="mt-4">
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="flex items-center gap-1 text-[10px] text-white/15 hover:text-white/25 transition-colors mx-auto"
+        >
+          <ChevronDown size={9} className={`transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
+          Developer options
+        </button>
+        {showAdvanced && (
+          <div className="mt-3 space-y-2 rounded-lg border border-white/[0.05] bg-white/[0.02] p-3">
+            <div className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-[#111114] px-3">
+              <input
+                type={showToken ? "text" : "password"}
+                value={manualToken}
+                onChange={(e) => setManualToken(e.target.value)}
+                placeholder="System User Access Token"
+                className="flex-1 bg-transparent py-2 text-[11px] font-mono text-white outline-none"
+                autoComplete="off"
+              />
+              <button onClick={() => setShowToken((v) => !v)} className="text-white/15 hover:text-white/30">
+                {showToken ? <EyeOff size={11} /> : <Eye size={11} />}
               </button>
-            )}
-
-            {sdkError && !hasConfigId && null}
-
-            {/* Manual token fallback */}
-            {(showManual || !hasConfigId) ? (
-              <div className="space-y-3 rounded-xl border border-white/[0.05] bg-white/[0.02] p-4">
-                <p className="text-[11px] text-white/30 leading-relaxed">
-                  Paste your <strong>System User Access Token</strong> from Meta Business Manager.
-                </p>
-                <div className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-[#111114] px-3">
-                  <input
-                    type={showToken ? "text" : "password"}
-                    value={manualToken}
-                    onChange={(e) => setManualToken(e.target.value)}
-                    placeholder="EAAxxxxxxxxxxxxxx"
-                    className="flex-1 bg-transparent py-2.5 text-[12px] font-mono text-white outline-none"
-                    autoComplete="off"
-                  />
-                  <button onClick={() => setShowToken((v) => !v)} className="text-white/15 hover:text-white/30">
-                    {showToken ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
-                </div>
-                <button onClick={handleManualConnect} disabled={loading}
-                  className="w-full rounded-lg bg-[#25D366] py-2.5 text-[12px] font-bold text-white hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center justify-center gap-2">
-                  {loading && <Loader2 size={13} className="animate-spin" />}
-                  {loading ? "Connecting..." : "Connect with Token"}
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setShowManual(true)}
-                className="flex items-center gap-1 text-[11px] text-white/20 hover:text-white/30 transition-colors mx-auto"
-              >
-                <ChevronDown size={10} />
-                Use token manually instead
-              </button>
-            )}
-
-            {err && <p className="text-sm text-red-400">{err}</p>}
+            </div>
+            <button onClick={handleManualConnect} disabled={loading}
+              className="w-full rounded-lg bg-white/[0.06] py-2 text-[11px] font-semibold text-white/40 hover:bg-white/[0.08] disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5">
+              {loading && <Loader2 size={11} className="animate-spin" />}
+              Connect with token
+            </button>
           </div>
+        )}
+      </div>
 
-          {/* Skip option */}
-          <button
-            onClick={onDone}
-            className="mt-5 w-full text-center text-sm text-white/20 hover:text-white/40 transition-colors"
-          >
-            Skip for now — I&apos;ll connect later
-          </button>
-        </>
-      )}
+      {/* Skip */}
+      <button
+        onClick={onDone}
+        className="mt-4 w-full text-center text-[12px] text-white/15 hover:text-white/30 transition-colors"
+      >
+        Skip for now
+      </button>
     </motion.div>
   );
 }
