@@ -28,4 +28,15 @@ export const env = {
 
   // Meta webhook verification token (set in Meta Developer Console)
   metaWebhookVerifyToken: process.env.META_WEBHOOK_VERIFY_TOKEN || "yappaflow_webhook_verify",
+
+  // Meta WhatsApp Embedded Signup (reuses Instagram app if same Meta app)
+  metaAppId:        process.env.META_APP_ID     || process.env.INSTAGRAM_CLIENT_ID     || "",
+  metaAppSecret:    process.env.META_APP_SECRET  || process.env.INSTAGRAM_CLIENT_SECRET || "",
+  whatsappConfigId: process.env.WHATSAPP_CONFIG_ID || "",
+
+  // Anthropic (Claude AI Engine)
+  anthropicApiKey:    process.env.ANTHROPIC_API_KEY || "",
+  anthropicModel:    process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",
+  anthropicMaxTokens: parseInt(process.env.ANTHROPIC_MAX_TOKENS || "4096", 10),
+  aiMockMode:        process.env.AI_MOCK_MODE === "true" || !process.env.ANTHROPIC_API_KEY,
 } as const;

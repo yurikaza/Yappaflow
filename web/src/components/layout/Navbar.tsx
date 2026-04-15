@@ -5,9 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { NAV_LINKS } from "@/lib/constants";
-import { cn } from "@/lib/cn";
 import { Link, usePathname } from "@/i18n/navigation";
 
 export function Navbar() {
@@ -16,53 +14,59 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-brand-gray-100">
-      <Container className="flex h-16 items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <Container className="flex h-14 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-black">
-            <span className="text-sm font-bold text-white">Y</span>
-          </div>
-          <span className="text-lg font-bold tracking-tight">Yappaflow</span>
+        <Link href="/" className="flex items-center">
+          <span className="font-heading text-lg uppercase tracking-tight text-white">Yappaflow</span>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.key}
-              href={link.href}
-              className="text-sm text-gray-600 transition-colors hover:text-brand-black"
-            >
-              {t(link.key)}
-            </a>
+            link.href.startsWith("/") ? (
+              <Link
+                key={link.key}
+                href={link.href}
+                className="text-[11px] uppercase tracking-widest text-white/40 transition-colors hover:text-white"
+              >
+                {t(link.key)}
+              </Link>
+            ) : (
+              <a
+                key={link.key}
+                href={link.href}
+                className="text-[11px] uppercase tracking-widest text-white/40 transition-colors hover:text-white"
+              >
+                {t(link.key)}
+              </a>
+            )
           ))}
         </div>
 
-        {/* Desktop CTA + Language Toggle */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center gap-4">
           <Link
             href={pathname}
             locale={pathname === "/" ? "tr" : "en"}
-            className="text-sm text-gray-500 hover:text-brand-black transition-colors"
+            className="text-[11px] uppercase tracking-widest text-white/30 hover:text-white transition-colors"
           >
             TR / EN
           </Link>
-          <Button href={pathname === "/" ? "/en/auth" : "/tr/auth"} size="sm">
+          <a
+            href={pathname === "/" ? "/en/auth" : "/tr/auth"}
+            className="bg-brand-orange text-white text-[11px] uppercase tracking-widest px-5 py-2 hover:bg-brand-orange-dark transition-colors"
+          >
             {t("getStarted")}
-          </Button>
+          </a>
         </div>
 
-        {/* Mobile Menu Toggle */}
+        {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2"
+          className="md:hidden p-2 text-white/60"
           onClick={() => setMobileOpen(!mobileOpen)}
         >
-          {mobileOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </Container>
 
@@ -73,22 +77,22 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-brand-gray-100"
+            className="md:hidden bg-brand-dark/95 backdrop-blur-md border-b border-white/5"
           >
-            <Container className="py-4 flex flex-col gap-4">
+            <Container className="py-6 flex flex-col gap-4">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.key}
                   href={link.href}
-                  className="text-sm text-gray-600 hover:text-brand-black"
+                  className="text-sm uppercase tracking-widest text-white/40 hover:text-white"
                   onClick={() => setMobileOpen(false)}
                 >
                   {t(link.key)}
                 </a>
               ))}
-              <Button href="#cta" size="sm" className="w-full">
+              <a href="#cta" className="bg-brand-orange text-white text-xs uppercase tracking-widest px-5 py-3 text-center mt-2">
                 {t("getStarted")}
-              </Button>
+              </a>
             </Container>
           </motion.div>
         )}

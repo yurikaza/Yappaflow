@@ -1,99 +1,56 @@
-import { useTranslations } from "next-intl";
-import { Container } from "@/components/ui/Container";
+"use client";
+
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+
+const LINKS = [
+  { label: "Github", href: "#" },
+  { label: "X", href: "#" },
+  { label: "LinkedIn", href: "#" },
+  { label: "Contact", href: "#" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+];
 
 export function Footer() {
-  const t = useTranslations("footer");
-
-  const columns = [
-    {
-      title: t("platform"),
-      links: [
-        { label: t("compose"), href: "#" },
-        { label: t("guard"), href: "#" },
-        { label: t("command"), href: "#" },
-      ],
-    },
-    {
-      title: t("solutions"),
-      links: [
-        { label: t("ecommerce"), href: "#" },
-        { label: t("agency"), href: "#" },
-        { label: t("enterprise"), href: "#" },
-      ],
-    },
-    {
-      title: t("company"),
-      links: [
-        { label: t("about"), href: "#" },
-        { label: t("careers"), href: "#" },
-        { label: t("contact"), href: "#" },
-        { label: t("press"), href: "#" },
-      ],
-    },
-    {
-      title: t("legal"),
-      links: [
-        { label: t("privacy"), href: "#" },
-        { label: t("terms"), href: "#" },
-        { label: t("cookies"), href: "#" },
-      ],
-    },
-  ];
+  const footerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: footerRef, offset: ["start end", "end end"] });
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [0.05, 0.12]);
 
   return (
-    <footer className="border-t border-brand-gray-200 bg-white">
-      <Container className="py-16">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-6">
-          {/* Brand Column */}
-          <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-black">
-                <span className="text-sm font-bold text-white">Y</span>
-              </div>
-              <span className="text-lg font-bold tracking-tight">Yappaflow</span>
-            </div>
-
-            <div className="space-y-3 text-sm text-gray-500">
-              <div>
-                <p className="font-medium text-brand-gray-900">{t("headquarters")}</p>
-                <p>{t("address")}</p>
-              </div>
-              <div>
-                <p className="font-medium text-brand-gray-900">{t("getInTouch")}</p>
-                <p>{t("email")}</p>
-              </div>
-            </div>
-
-            <p className="mt-4 text-xs text-gray-400">{t("dataNotice")}</p>
+    <footer ref={footerRef} className="relative bg-brand-dark overflow-hidden">
+      {/* Top links bar */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 border-t border-white/[0.04]">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 max-w-7xl mx-auto">
+          <div className="flex flex-wrap gap-6">
+            {LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-[10px] uppercase tracking-widest text-white/20 hover:text-white/50 transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
-
-          {/* Link Columns */}
-          {columns.map((col) => (
-            <div key={col.title}>
-              <h3 className="mb-3 text-sm font-semibold text-brand-gray-900">
-                {col.title}
-              </h3>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-gray-500 transition-colors hover:text-brand-black"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <p className="text-[10px] uppercase tracking-widest text-white/10">
+            © 2026 Yappaflow. All rights reserved.
+          </p>
         </div>
+      </div>
 
-        {/* Bottom */}
-        <div className="mt-12 border-t border-brand-gray-200 pt-8 text-center text-sm text-gray-400">
-          {t("copyright")}
-        </div>
-      </Container>
+      {/* Massive "YAPPAFLOW" text — 30vh tall, fills bottom */}
+      <div className="relative h-[30vh] flex items-end justify-center overflow-hidden">
+        <motion.h2
+          style={{ opacity: textOpacity }}
+          className="font-heading uppercase tracking-tighter text-white leading-none select-none whitespace-nowrap pb-0"
+          // Font so large it overflows — intentional, only top portion visible
+        >
+          <span className="text-[clamp(8rem,22vw,25rem)]">
+            YAPPAFLOW
+          </span>
+        </motion.h2>
+      </div>
     </footer>
   );
 }

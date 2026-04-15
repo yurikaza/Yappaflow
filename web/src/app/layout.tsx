@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { inter, jetbrainsMono } from "@/lib/fonts";
+import { inter, anton, jetbrainsMono } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="bg-white text-brand-gray-900 antialiased">
+    <html className={`${inter.variable} ${anton.variable} ${jetbrainsMono.variable}`}>
+      <body className="bg-brand-dark text-white antialiased">
         {children}
       </body>
     </html>

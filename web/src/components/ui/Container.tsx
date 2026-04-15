@@ -1,3 +1,4 @@
+import React from "react";
 import { cn } from "@/lib/cn";
 
 interface ContainerProps {
@@ -9,11 +10,7 @@ interface ContainerProps {
 export function Container({
   children,
   className,
-  as: Component = "div",
+  as = "div",
 }: ContainerProps) {
-  return (
-    <Component className={cn("mx-auto max-w-7xl px-4 sm:px-6 lg:px-8", className)}>
-      {children}
-    </Component>
-  );
+  return React.createElement(as, { className: cn("mx-auto max-w-7xl px-4 sm:px-6 lg:px-8", className) }, children);
 }

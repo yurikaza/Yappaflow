@@ -28,18 +28,68 @@ export async function handleWhatsAppWebhook(entry: unknown[]): Promise<void> {
     for (const change of e.changes as Array<{ field: string; value: unknown }>) {
       if (change.field !== "messages") continue;
       const val = change.value as {
-        metadata:  { phone_number_id: string };
+        metadata:  { phone_number_id: string; display_phone_number?: string };
         messages?: WAMessage[];
         contacts?: WAContact[];
+        statuses?: Array<{ id: string; status: string; timestamp: string; recipient_id: string }>;
       };
 
       const messages = val.messages ?? [];
       const contacts  = val.contacts ?? [];
-      const phoneNumberId = val.metadata?.phone_number_id;
+      const phoneNumberId    = val.metadata?.phone_number_id;
+      const displayPhoneRaw  = val.metadata?.display_phone_number; // e.g. "905455876255"
+      const displayPhone     = displayPhoneRaw ? normalizePhone(displayPhoneRaw) : "";
+      // Also keep the raw digits without + for matching stored values
+      const displayPhoneDigits = displayPhoneRaw?.replace(/[^\d]/g, "") ?? "";
 
-      // Find which agency owns this phone number
-      const conn = await PlatformConnection.findOne({ phoneNumberId, isActive: true });
-      if (!conn) { log(`WA webhook: no connection for phoneNumberId ${phoneNumberId}`); continue; }
+      log(`📨 WA Cloud API: phoneNumberId=${phoneNumberId}, displayPhone=${displayPhone}, messages=${messages.length}`);
+
+      // Log delivery status updates (sent/delivered/read receipts)
+      const statuses = val.statuses ?? [];
+      for (const s of statuses) {
+        log(`📬 WA status: message ${s.id} → ${s.status} (recipient: ${s.recipient_id})`);
+      }
+
+      // If no messages, this is just a status update — skip message processing
+      if (messages.length === 0) continue;
+
+      // 1) Exact match by phoneNumberId (ideal — set during WABA onboarding)
+      let conn = await PlatformConnection.findOne({ phoneNumberId, isActive: true });
+
+      // 2) Fallback: match by displayPhone (set during WhatsApp OTP login or WABA connect)
+      //    Try multiple format variations since phone can be stored as +905551234567,
+      //    905551234567, or with spaces/dashes
+      if (!conn && displayPhoneRaw) {
+        const phoneVariants = [displayPhone, displayPhoneRaw, displayPhoneDigits, `+${displayPhoneDigits}`]
+          .filter((v, i, a) => v && a.indexOf(v) === i); // unique non-empty
+        conn = await PlatformConnection.findOne({
+          displayPhone: { $in: phoneVariants },
+          platform: { $in: ["whatsapp", "whatsapp_business"] },
+          isActive: true,
+        });
+        if (conn) {
+          log(`⚠️  Matched by displayPhone ${displayPhone} (no phoneNumberId stored). Saving phoneNumberId for future lookups.`);
+          // Persist the phoneNumberId so future lookups are instant
+          await PlatformConnection.findByIdAndUpdate(conn._id, { phoneNumberId });
+        }
+      }
+
+      // 3) Last resort: if only one WA connection exists, use it
+      if (!conn) {
+        const all = await PlatformConnection.find({
+          platform: { $in: ["whatsapp", "whatsapp_business"] },
+          isActive: true,
+        });
+        if (all.length === 1) {
+          conn = all[0];
+          log(`⚠️  No phoneNumberId/displayPhone match — using single active WA connection (${conn.displayPhone}). Saving phoneNumberId.`);
+          await PlatformConnection.findByIdAndUpdate(conn._id, { phoneNumberId });
+        } else {
+          log(`❌ WA webhook: no connection for phoneNumberId ${phoneNumberId} or displayPhone ${displayPhone}. ${all.length} WA connections exist.`);
+          continue;
+        }
+      }
+
       const agencyId = conn.userId.toString();
 
       for (const msg of messages) {
@@ -181,6 +231,13 @@ export async function handleInstagramWebhook(entry: unknown[]): Promise<void> {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
+
+/** Strip all non-digit chars except leading + for phone comparison */
+function normalizePhone(raw: string): string {
+  const digits = raw.replace(/[^\d+]/g, "");
+  return digits.startsWith("+") ? digits : `+${digits}`;
+}
+
 function extractWAText(msg: WAMessage): string {
   if (msg.text)     return msg.text.body;
   if (msg.image)    return "[image]";

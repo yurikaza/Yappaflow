@@ -18,7 +18,7 @@ interface TabBarProps {
 
 export function TabBar({ tabs, activeTab, onTabChange, className }: TabBarProps) {
   return (
-    <div className={cn("flex gap-8 border-b border-brand-gray-200", className)}>
+    <div className={cn("flex gap-8 border-b border-brand-border", className)}>
       {tabs.map((tab) => (
         <button
           key={tab.key}
@@ -26,18 +26,15 @@ export function TabBar({ tabs, activeTab, onTabChange, className }: TabBarProps)
           className={cn(
             "relative pb-4 text-left transition-colors cursor-pointer",
             activeTab === tab.key
-              ? "text-brand-black"
-              : "text-gray-400 hover:text-gray-600"
+              ? "text-brand-orange"
+              : "text-brand-text-tertiary hover:text-brand-text-secondary"
           )}
         >
-          <span className="text-lg font-semibold">{tab.label}</span>
-          {tab.sublabel && (
-            <span className="block text-sm font-normal mt-0.5">{tab.sublabel}</span>
-          )}
+          <span className="text-sm font-medium uppercase tracking-wider">{tab.label}</span>
           {activeTab === tab.key && (
             <motion.div
               layoutId="tab-underline"
-              className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-black"
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-orange"
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
           )}

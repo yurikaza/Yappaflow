@@ -4,6 +4,12 @@ import { PlatformConnection } from "../../models/PlatformConnection.model";
 import { ChatMessage }        from "../../models/ChatMessage.model";
 import { Signal }             from "../../models/Signal.model";
 import type { AuthContext }   from "../../middleware/auth";
+import { env }                from "../../config/env";
+import { log, logError }      from "../../utils/logger";
+import {
+  importInstagramConversations,
+  importWhatsAppConversations,
+} from "../../services/import-conversations.service";
 
 export const platformResolvers = {
   Query: {
@@ -79,6 +85,137 @@ export const platformResolvers = {
         },
         { upsert: true, new: true }
       );
+
+      // Subscribe this WABA to receive webhook events
+      try {
+        await axios.post(
+          `https://graph.facebook.com/v19.0/${wabaId}/subscribed_apps`,
+          {},
+          { headers: { Authorization: `Bearer ${input.accessToken}` } }
+        );
+        log(`WA: WABA ${wabaId} subscribed to webhooks`);
+      } catch (err: unknown) {
+        logError("WA webhook subscription failed (non-fatal)", err);
+      }
+
+      return serializeConn(doc);
+    },
+
+    /** Connect WhatsApp Business via Embedded Signup (one-click OAuth popup) */
+    connectWhatsAppEmbedded: async (
+      _: unknown,
+      { input }: { input: { code: string; wabaId?: string; phoneNumberId?: string; redirectUri?: string } },
+      ctx: AuthContext
+    ) => {
+      if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
+
+      if (!env.metaAppId || !env.metaAppSecret) {
+        throw new GraphQLError("Meta App credentials not configured on server", {
+          extensions: { code: "SERVER_CONFIG_ERROR" },
+        });
+      }
+
+      // 1. Exchange authorization code for long-lived access token
+      let accessToken: string;
+      try {
+        const { data } = await axios.get(
+          "https://graph.facebook.com/v21.0/oauth/access_token",
+          {
+            params: {
+              client_id:     env.metaAppId,
+              client_secret: env.metaAppSecret,
+              code:          input.code,
+              redirect_uri:  input.redirectUri || env.frontendUrl,
+            },
+          }
+        );
+        accessToken = data.access_token;
+        if (!accessToken) throw new Error("No access_token in response");
+        log(`✅ Embedded Signup: token exchanged successfully`);
+      } catch (err: unknown) {
+        const msg = (err as { response?: { data?: { error?: { message?: string } } } })
+          ?.response?.data?.error?.message
+          ?? (err instanceof Error ? err.message : "Token exchange failed");
+        logError("Embedded Signup token exchange failed", err);
+        throw new GraphQLError(`Token exchange failed: ${msg}`, {
+          extensions: { code: "BAD_USER_INPUT" },
+        });
+      }
+
+      // 2. Resolve wabaId and phoneNumberId — use provided values or auto-discover from token
+      let wabaId = input.wabaId;
+      let phoneNumberId = input.phoneNumberId;
+      let displayPhone = "";
+
+      if (!wabaId || !phoneNumberId) {
+        try {
+          // Auto-discover WABA from the token
+          const { data: wabaRes } = await axios.get(
+            "https://graph.facebook.com/v21.0/me/whatsapp_business_accounts",
+            { params: { access_token: accessToken } }
+          );
+          const waba = wabaRes.data?.[0];
+          if (!waba?.id) throw new Error("No WhatsApp Business Account found on this token");
+          wabaId = waba.id;
+
+          // Auto-discover phone numbers under the WABA
+          const { data: phoneRes } = await axios.get(
+            `https://graph.facebook.com/v21.0/${wabaId}/phone_numbers`,
+            { params: { fields: "id,display_phone_number", access_token: accessToken } }
+          );
+          const phone = phoneRes.data?.[0];
+          if (!phone?.id) throw new Error("No phone numbers found under this WhatsApp Business Account");
+          phoneNumberId = phone.id;
+          displayPhone = phone.display_phone_number ?? "";
+          log(`📱 Embedded Signup: auto-discovered WABA ${wabaId}, phone ${displayPhone} (${phoneNumberId})`);
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Could not discover WhatsApp Business Account";
+          throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
+        }
+      } else {
+        // wabaId and phoneNumberId provided — just fetch display phone
+        try {
+          const { data } = await axios.get(
+            `https://graph.facebook.com/v21.0/${phoneNumberId}`,
+            { params: { fields: "display_phone_number", access_token: accessToken } }
+          );
+          displayPhone = data.display_phone_number ?? "";
+          log(`📱 Embedded Signup: phone number ${displayPhone} (ID: ${phoneNumberId})`);
+        } catch {
+          log(`⚠️  Could not fetch display phone for ${phoneNumberId}`);
+        }
+      }
+
+      // 3. Upsert PlatformConnection
+      const doc = await PlatformConnection.findOneAndUpdate(
+        { userId: ctx.userId, platform: "whatsapp_business" },
+        {
+          $set: {
+            userId:        ctx.userId,
+            platform:      "whatsapp_business",
+            wabaId,
+            phoneNumberId,
+            displayPhone,
+            accessToken,
+            isActive:      true,
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      // 4. Subscribe this WABA to receive webhook events
+      try {
+        await axios.post(
+          `https://graph.facebook.com/v21.0/${wabaId}/subscribed_apps`,
+          {},
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        log(`📡 Embedded Signup: WABA ${wabaId} subscribed to webhooks`);
+      } catch (err: unknown) {
+        logError("Webhook subscription failed (non-fatal)", err);
+        log(`⚠️  Webhook subscription failed for WABA ${wabaId}. Messages may not arrive until subscribed.`);
+      }
+
       return serializeConn(doc);
     },
 
@@ -94,7 +231,7 @@ export const platformResolvers = {
       let igData: { id: string; username?: string; instagram_business_account?: { id: string } };
       try {
         const { data } = await axios.get("https://graph.facebook.com/v19.0/me/accounts", {
-          params: { fields: "instagram_business_account,name", access_token: accessToken },
+          params: { fields: "instagram_business_account,name,access_token", access_token: accessToken },
         });
         const page = data.data?.[0];
         const igAccountId = page?.instagram_business_account?.id;
@@ -104,6 +241,16 @@ export const platformResolvers = {
           params: { fields: "id,username", access_token: accessToken },
         });
         igData = { id: igProfile.data.id, username: igProfile.data.username, instagram_business_account: { id: igAccountId } };
+
+        // Subscribe page to messaging webhooks so we receive Instagram DMs
+        const pageId = page.id;
+        const pageAccessToken = page.access_token ?? accessToken;
+        await axios.post(
+          `https://graph.facebook.com/v19.0/${pageId}/subscribed_apps`,
+          null,
+          { params: { subscribed_fields: "messages", access_token: pageAccessToken } }
+        );
+        log(`IG: subscribed page ${pageId} to messaging webhooks`);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Instagram credentials invalid";
         throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
@@ -124,6 +271,10 @@ export const platformResolvers = {
         },
         { upsert: true, new: true }
       );
+
+      // Kick off DM history import in background (non-blocking)
+      importInstagramConversations(ctx.userId).catch(() => null);
+
       return serializeConn(doc);
     },
 
@@ -183,6 +334,23 @@ export const platformResolvers = {
       });
 
       return serializeMsg(doc);
+    },
+
+    /** Import existing conversation history from a platform */
+    importPlatformMessages: async (
+      _: unknown,
+      { platform }: { platform: string },
+      ctx: AuthContext
+    ) => {
+      if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
+
+      if (platform === "instagram" || platform === "instagram_dm") {
+        return importInstagramConversations(ctx.userId);
+      }
+      if (platform === "whatsapp" || platform === "whatsapp_business") {
+        return importWhatsAppConversations(ctx.userId);
+      }
+      throw new GraphQLError(`Unknown platform: ${platform}`, { extensions: { code: "BAD_USER_INPUT" } });
     },
 
     /** Disconnect a platform */

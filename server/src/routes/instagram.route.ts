@@ -6,6 +6,7 @@ import {
   exchangeCodeForToken,
   getInstagramProfile,
 } from "../services/instagram.service";
+import { importInstagramConversations } from "../services/import-conversations.service";
 import { User } from "../models/User.model";
 import { PlatformConnection } from "../models/PlatformConnection.model";
 import { signToken } from "../services/jwt.service";
@@ -74,6 +75,11 @@ router.get("/instagram/callback", async (req: Request, res: Response): Promise<v
             },
           },
           { upsert: true, new: true }
+        );
+
+        // Auto-import existing DM conversations (non-blocking)
+        importInstagramConversations(user.id).catch((e) =>
+          logError("importInstagramConversations failed", e)
         );
       }
     } catch {

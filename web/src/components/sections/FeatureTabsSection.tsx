@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Headphones, Code, Rocket } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { TabBar } from "@/components/ui/TabBar";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
 const TAB_ICONS = {
@@ -20,9 +19,9 @@ export function FeatureTabsSection() {
   const [activeTab, setActiveTab] = useState("listen");
 
   const tabs = [
-    { key: "listen", label: t("listen"), sublabel: t("listenSub") },
-    { key: "build", label: t("build"), sublabel: t("buildSub") },
-    { key: "ship", label: t("ship"), sublabel: t("shipSub") },
+    { key: "listen", label: t("listen") },
+    { key: "build", label: t("build") },
+    { key: "ship", label: t("ship") },
   ];
 
   const tabContent = {
@@ -35,7 +34,7 @@ export function FeatureTabsSection() {
   const Icon = TAB_ICONS[activeTab as keyof typeof TAB_ICONS];
 
   return (
-    <section id="features" className="py-20 sm:py-28">
+    <section id="features" className="py-24 sm:py-32">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -43,6 +42,7 @@ export function FeatureTabsSection() {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
         >
+          <p className="text-xs uppercase tracking-[0.3em] text-white/30 mb-4">How it works</p>
           <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </motion.div>
 
@@ -53,28 +53,23 @@ export function FeatureTabsSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="mt-12 grid gap-8 lg:grid-cols-2 items-center"
+            className="mt-16 grid gap-12 lg:grid-cols-2 items-center"
           >
             {/* Text */}
             <div>
-              <h3 className="text-2xl font-bold sm:text-3xl">{content.title}</h3>
-              <p className="mt-4 text-gray-600 leading-relaxed">{content.desc}</p>
-              <Button href="#cta" variant="secondary" className="mt-6">
+              <h3 className="font-heading text-3xl uppercase tracking-tight sm:text-4xl">
+                {content.title}
+              </h3>
+              <p className="mt-6 text-white/50 leading-relaxed">{content.desc}</p>
+              <Button href="#cta" variant="link" className="mt-6" arrow>
                 {t("listenSub")}
               </Button>
             </div>
 
-            {/* Card Preview */}
-            <Card className="relative overflow-hidden bg-gradient-to-br from-white to-brand-peach-light/30">
-              <div className="flex flex-col items-center justify-center py-16">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-gray-100">
-                  <Icon className="h-8 w-8 text-brand-gray-900" />
-                </div>
-                <p className="mt-4 text-sm font-medium text-gray-500">
-                  {content.title}
-                </p>
-              </div>
-            </Card>
+            {/* Icon Preview */}
+            <div className="flex items-center justify-center py-20 border border-white/5 rounded-lg">
+              <Icon className="h-16 w-16 text-white/10" strokeWidth={1} />
+            </div>
           </motion.div>
         </AnimatePresence>
       </Container>

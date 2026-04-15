@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
+import { TiltCard } from "@/components/ui/TiltCard";
 
 const categories = ["cms", "hosting", "messaging"] as const;
 
@@ -35,24 +35,22 @@ export function IntegrationGrid() {
   );
 
   return (
-    <section id="integrations" className="py-20 sm:py-28">
+    <section id="integrations" className="py-24 sm:py-32 bg-brand-surface-secondary">
       <Container>
-        <div className="grid gap-12 lg:grid-cols-2">
-          {/* Left */}
+        <div className="grid gap-16 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            <h2 className="font-heading text-4xl uppercase tracking-tight text-brand-text-primary sm:text-5xl lg:text-6xl">
               {t("headline")}
             </h2>
-            <p className="mt-4 text-gray-600 leading-relaxed">
+            <p className="mt-6 text-brand-text-secondary leading-relaxed">
               {t("description")}
             </p>
-
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap gap-2">
               {categories.map((cat) => (
                 <button key={cat} onClick={() => setActiveCategory(cat)}>
                   <Badge variant={activeCategory === cat ? "active" : "default"}>
@@ -63,29 +61,26 @@ export function IntegrationGrid() {
             </div>
           </motion.div>
 
-          {/* Right */}
           <div className="grid grid-cols-2 gap-4">
             {filtered.map(({ key, Icon }, i) => (
               <motion.div
                 key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
               >
-                <Card hover className="h-full">
+                <TiltCard className="h-full" maxTilt={4}>
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-gray-100">
-                      <Icon className="h-5 w-5 text-brand-gray-900" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-orange/10">
+                      <Icon className="h-5 w-5 text-brand-orange" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h4 className="font-semibold">{t(key)}</h4>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {t(`${key}Desc`)}
-                      </p>
+                      <h4 className="font-medium text-brand-text-primary">{t(key)}</h4>
+                      <p className="mt-1 text-xs text-brand-text-secondary">{t(`${key}Desc`)}</p>
                     </div>
                   </div>
-                </Card>
+                </TiltCard>
               </motion.div>
             ))}
           </div>

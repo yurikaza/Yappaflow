@@ -2,54 +2,48 @@
 
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
-import { ShieldCheck, Lock, FileCheck } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 
 const badges = [
-  { label: "SOC 2", sublabel: "Type II", Icon: ShieldCheck },
-  { label: "ISO", sublabel: "27001", Icon: Lock },
-  { label: "GDPR", sublabel: "Compliant", Icon: FileCheck },
+  { label: "SOC 2", sublabel: "Type II" },
+  { label: "ISO", sublabel: "27001" },
+  { label: "GDPR", sublabel: "Compliant" },
 ];
 
 export function TrustBadgesSection() {
   const t = useTranslations("trust");
 
   return (
-    <section className="py-20 sm:py-28">
-      <Container className="text-center">
+    <section className="py-24 sm:py-32 bg-brand-surface-secondary">
+      <Container>
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
+          className="text-center"
         >
-          {/* Badges */}
-          <div className="flex items-center justify-center gap-6 sm:gap-10 mb-8">
-            {badges.map(({ label, sublabel, Icon }, i) => (
+          <h2 className="font-heading text-3xl uppercase tracking-tight text-brand-text-primary sm:text-4xl mb-4">
+            {t("headline")}
+          </h2>
+          <p className="text-brand-text-secondary max-w-md mx-auto">{t("description")}</p>
+
+          <div className="flex items-center justify-center gap-6 mt-12">
+            {badges.map(({ label, sublabel }, i) => (
               <motion.div
                 key={label}
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="flex flex-col items-center"
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                animate={{ y: [0, -6, 0] }}
+                className="glass rounded-xl px-8 py-6 flex flex-col items-center shadow-lg"
               >
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-purple text-white">
-                  <Icon className="h-8 w-8" />
-                </div>
-                <span className="mt-2 text-sm font-bold">{label}</span>
-                <span className="text-xs text-gray-500">{sublabel}</span>
+                <span className="text-2xl font-heading uppercase text-brand-text-primary">{label}</span>
+                <span className="text-[10px] uppercase tracking-widest text-brand-text-tertiary mt-1">{sublabel}</span>
               </motion.div>
             ))}
           </div>
-
-          <h2 className="text-xl font-semibold sm:text-2xl">{t("headline")}</h2>
-          <p className="mt-2 text-gray-500 max-w-md mx-auto">{t("description")}</p>
-
-          <Button href="#" variant="secondary" className="mt-6">
-            {t("viewTrustCenter")}
-          </Button>
         </motion.div>
       </Container>
     </section>

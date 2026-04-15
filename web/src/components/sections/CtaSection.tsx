@@ -1,80 +1,73 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
-import { Container } from "@/components/ui/Container";
-import { GradientBackground } from "@/components/ui/GradientBackground";
-import { Button } from "@/components/ui/Button";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 
 export function CtaSection() {
-  const t = useTranslations("cta");
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "start 30%"] });
+  const headingO = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const headingY = useTransform(scrollYProgress, [0, 1], [80, 0]);
 
   return (
-    <section id="cta">
-      <GradientBackground variant="cool" className="py-20 sm:py-28">
-        <Container>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="grid gap-12 lg:grid-cols-2 items-center"
-          >
-            {/* Left */}
-            <div>
-              <p className="text-sm font-medium text-white/60 uppercase tracking-wider mb-2">
-                10 Minutes. Your Content. Live Results.
-              </p>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                {t("headline")}
-              </h2>
-              <p className="mt-4 text-white/70 leading-relaxed">
-                {t("description")}
-              </p>
+    <section ref={sectionRef} className="relative bg-brand-dark py-32 sm:py-44 overflow-hidden">
+      {/* Atmosphere */}
+      <div className="absolute inset-0">
+        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-brand-orange/[0.03] blur-[200px]" />
+      </div>
 
-              {/* Email Form */}
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder={t("emailPlaceholder")}
-                  className="flex-1 rounded-lg bg-white/10 border border-white/20 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
-                />
-                <Button className="bg-white text-brand-black hover:bg-gray-100" size="lg">
-                  {t("getDemo")}
-                </Button>
-              </div>
+      {/* Grain */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44IiBudW1PY3RhdmVzPSI0IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNuKSIgb3BhY2l0eT0iMSIvPjwvc3ZnPg==")`,
+          backgroundRepeat: "repeat",
+        }}
+      />
 
-              <div className="mt-3">
-                <Button
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                  size="sm"
-                >
-                  {t("watchDemo")}
-                </Button>
-              </div>
-            </div>
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+        <motion.div style={{ opacity: headingO, y: headingY }}>
+          {/* Eyebrow */}
+          <p className="text-[10px] uppercase tracking-[0.5em] text-brand-orange/60 mb-8">
+            Get Started
+          </p>
 
-            {/* Right: Testimonial */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+          {/* Massive headline */}
+          <h2 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl uppercase tracking-tight leading-[0.9] text-white mb-10">
+            Ready to<br />
+            <span className="text-brand-orange">automate</span><br />
+            your agency?
+          </h2>
+
+          {/* Description */}
+          <p className="text-sm sm:text-base text-white/30 max-w-lg leading-relaxed mb-10">
+            Join agencies already shipping faster with Yappaflow. Connect your channels, generate code from conversations, and deploy in minutes — not weeks.
+          </p>
+
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="#"
+              className="inline-flex items-center justify-center gap-2 bg-brand-orange text-white text-xs uppercase tracking-widest px-10 py-5 hover:bg-brand-orange-dark transition-colors"
             >
-              <blockquote className="text-lg text-white/90 italic leading-relaxed">
-                {t("testimonial")}
-              </blockquote>
-              <div className="mt-4">
-                <p className="text-sm font-semibold text-white">
-                  {t("testimonialAuthor")}
-                </p>
-                <p className="text-sm text-white/60">{t("testimonialCompany")}</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        </Container>
-      </GradientBackground>
+              Start Free Trial
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+            <a
+              href="#"
+              className="inline-flex items-center justify-center gap-2 border border-white/10 text-white/60 text-xs uppercase tracking-widest px-10 py-5 hover:border-white/25 hover:text-white transition-all"
+            >
+              Book a Demo
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </div>
+
+          {/* Trust line */}
+          <p className="mt-8 text-[10px] uppercase tracking-widest text-white/15">
+            No credit card required · Free for 14 days · Cancel anytime
+          </p>
+        </motion.div>
+      </div>
     </section>
   );
 }

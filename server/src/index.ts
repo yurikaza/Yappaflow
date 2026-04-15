@@ -7,9 +7,12 @@ import { connectDatabase } from "./config/db";
 import { env } from "./config/env";
 import { log } from "./utils/logger";
 import { buildAuthContext } from "./middleware/auth";
+import { isMockMode } from "./ai/client";
 import instagramRouter from "./routes/instagram.route";
 import webhooksRouter  from "./routes/webhooks.route";
 import sseRouter       from "./routes/sse.route";
+import aiStreamRouter  from "./routes/ai-stream.route";
+import aiDebugRouter   from "./routes/ai-debug.route";
 
 // Accept requests from any localhost port in dev, or the configured frontend URL in prod
 const allowedOrigins = [
@@ -17,6 +20,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
+  "https://yappaflow.com",
+  "https://www.yappaflow.com",
 ];
 
 const corsOptions: cors.CorsOptions = {
@@ -24,6 +29,10 @@ const corsOptions: cors.CorsOptions = {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Allow ngrok tunnels (*.ngrok-free.dev, *.ngrok.io) in dev
+    if (env.nodeEnv !== "production" && origin && (origin.includes(".ngrok-free.dev") || origin.includes(".ngrok.io"))) {
+      return callback(null, true);
+    }
     callback(new Error(`CORS: origin ${origin} not allowed`));
   },
   credentials: true,
@@ -39,6 +48,8 @@ async function main() {
   app.use("/auth",    cors(corsOptions), express.json(), instagramRouter);
   app.use("/webhook", cors(corsOptions), express.json(), webhooksRouter);
   app.use("/events",  cors(corsOptions), sseRouter);
+  app.use("/ai",      cors(corsOptions), express.json(), aiStreamRouter);
+  app.use("/ai/debug", cors(corsOptions), express.json(), aiDebugRouter);
 
   const apolloServer = createApolloServer();
   await apolloServer.start();
@@ -56,9 +67,38 @@ async function main() {
   });
 
   app.listen(env.port, () => {
-    log(`Server running at http://localhost:${env.port}`);
-    log(`GraphQL at http://localhost:${env.port}/graphql`);
-    log(`Instagram OAuth at http://localhost:${env.port}/auth/instagram/authorize`);
+    const base = `http://localhost:${env.port}`;
+    log(`\n🚀 Server running at ${base}`);
+    log(`   GraphQL        → ${base}/graphql`);
+    log(`   Instagram OAuth→ ${base}/auth/instagram/authorize`);
+    log(`\n📡 Webhook endpoints:`);
+    log(`   Meta Cloud API → POST ${base}/webhook`);
+    log(`      Verify token: ${env.metaWebhookVerifyToken}`);
+    log(`      Register at: https://developers.facebook.com/apps → Webhooks`);
+    log(`   Twilio WA      → POST ${base}/webhook/twilio`);
+    log(`      Register at: https://console.twilio.com → Messaging → WhatsApp → Sandbox Settings`);
+    log(`      "When a message comes in" → <your-ngrok-url>/webhook/twilio`);
+    log(`   Debug (dev)    → POST ${base}/webhook/debug`);
+    log(`      curl -X POST ${base}/webhook/debug \\`);
+    log(`           -H "Content-Type: application/json" \\`);
+    log(`           -d '{"phone":"+905551234567","name":"Test","message":"Hello"}'`);
+    log(`\n🤖 AI Engine:`);
+    if (isMockMode()) {
+      log(`   Mode: MOCK (no API key — using sample data)`);
+      log(`   Set ANTHROPIC_API_KEY in .env for real AI responses`);
+    } else {
+      log(`   Mode: LIVE (${env.anthropicModel})`);
+    }
+    log(`   Stream     → GET ${base}/ai/stream/:sessionId`);
+    log(`\n🧪 AI Debug (dev only — no auth needed):`);
+    log(`   Test analyze → curl -X POST ${base}/ai/debug/test -H "Content-Type: application/json" -d '{"scenario":"fashion-ecommerce","mode":"analyze"}'`);
+    log(`   Test full    → curl -X POST ${base}/ai/debug/test -H "Content-Type: application/json" -d '{"scenario":"tech-startup","mode":"full"}'`);
+    log(`   Sessions    → GET ${base}/ai/debug/sessions`);
+    log(`   Cleanup     → DELETE ${base}/ai/debug/cleanup`);
+    log(`   Scenarios: fashion-ecommerce, restaurant, tech-startup`);
+    log(`\n💡 For local testing, expose this server with:`);
+    log(`   npx ngrok http ${env.port}`);
+    log(`   Then use the ngrok URL for webhook registration.\n`);
   });
 }
 

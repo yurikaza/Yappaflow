@@ -10,10 +10,10 @@ export function Badge({ children, variant = "default", className }: BadgeProps) 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",
+        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wider transition-colors",
         variant === "active"
-          ? "bg-brand-black text-white"
-          : "border border-brand-gray-200 text-brand-gray-900",
+          ? "bg-brand-orange text-white"
+          : "border border-brand-border-strong text-brand-text-secondary hover:text-brand-orange hover:border-brand-orange",
         className
       )}
     >

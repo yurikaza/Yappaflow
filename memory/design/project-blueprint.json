@@ -1,0 +1,22 @@
+{
+  "project": {
+    "name": "Creative Agency",
+    "type": "agency"
+  },
+  "brand": {
+    "tone": ["bold", "minimal"]
+  },
+  "design": {
+    "style": "bold-minimal"
+  },
+  "pages": [
+    {
+      "name": "Home",
+      "sections": [
+        { "type": "hero" },
+        { "type": "projects" },
+        { "type": "contact" }
+      ]
+    }
+  ]
+}
