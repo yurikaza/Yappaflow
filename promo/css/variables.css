@@ -1,34 +1,72 @@
 /* ============================================
    YAPPAFLOW PROMO — Design Tokens
-   All variables prefixed --yf- to avoid
-   Squarespace namespace collisions.
+   Light theme + Brand Orange + SuisseIntl
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+/* --- SuisseIntl Font Faces --- */
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('../fonts/SuisseIntl-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('../fonts/SuisseIntl-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('../fonts/SuisseIntl-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SuisseIntl';
+  src: url('../fonts/SuisseIntl-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Mono font for code/labels */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* ---- Colors ---- */
-  --yf-bg-primary: #0A0A0A;
-  --yf-bg-card: #111111;
-  --yf-bg-card-hover: #161616;
-  --yf-bg-elevated: #1A1A1A;
-  --yf-border: #222222;
-  --yf-border-hover: #333333;
+  /* ---- Colors (Light Theme) ---- */
+  --yf-bg: #FAFAF9;
+  --yf-bg-card: #FFFFFF;
+  --yf-bg-card-hover: #F8F7F5;
+  --yf-bg-elevated: #F5F2EB;
+  --yf-bg-dark: #0A0A0A;
+  --yf-border: #E8E5E0;
+  --yf-border-hover: #D5D2CD;
 
-  --yf-text-primary: #FFFFFF;
-  --yf-text-secondary: rgba(255, 255, 255, 0.7);
-  --yf-text-muted: rgba(255, 255, 255, 0.4);
+  --yf-text: #1A1A1A;
+  --yf-text-secondary: rgba(26, 26, 26, 0.6);
+  --yf-text-muted: rgba(26, 26, 26, 0.3);
 
-  --yf-accent: #00F0FF;
-  --yf-accent-hover: #00D4E0;
-  --yf-accent-dim: rgba(0, 240, 255, 0.15);
-  --yf-accent-glow: 0 0 20px rgba(0, 240, 255, 0.3);
-  --yf-accent-glow-strong: 0 0 40px rgba(0, 240, 255, 0.4), 0 0 80px rgba(0, 240, 255, 0.15);
+  /* Brand Orange */
+  --yf-accent: #FF6B35;
+  --yf-accent-hover: #E85A28;
+  --yf-accent-dim: rgba(255, 107, 53, 0.08);
+  --yf-accent-glow: 0 4px 24px rgba(255, 107, 53, 0.2);
+
+  /* Dashboard mockup colors */
+  --yf-dash-bg: #F5F5F5;
+  --yf-dash-sidebar: #FFFFFF;
+  --yf-dash-border: #EFEFEF;
+  --yf-dash-orange: #F97316;
+  --yf-dash-green: #22C55E;
+  --yf-dash-blue: #3B82F6;
 
   /* ---- Typography ---- */
-  --yf-font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-  --yf-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --yf-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --yf-font: 'SuisseIntl', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+  --yf-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --yf-text-xs: 0.75rem;
   --yf-text-sm: 0.875rem;
@@ -36,10 +74,10 @@
   --yf-text-lg: 1.125rem;
   --yf-text-xl: 1.25rem;
   --yf-text-2xl: 1.5rem;
-  --yf-text-3xl: 2rem;
-  --yf-text-4xl: 2.5rem;
+  --yf-text-3xl: clamp(1.5rem, 3vw, 2.25rem);
+  --yf-text-4xl: clamp(2rem, 4vw, 3rem);
   --yf-text-5xl: clamp(2.5rem, 5vw, 4rem);
-  --yf-text-hero: clamp(3rem, 8vw, 7rem);
+  --yf-text-hero: clamp(3rem, 7.5vw, 9.5rem);
 
   /* ---- Spacing ---- */
   --yf-space-xs: 0.25rem;
@@ -50,15 +88,16 @@
   --yf-space-2xl: 3rem;
   --yf-space-3xl: 4rem;
   --yf-space-4xl: 6rem;
-  --yf-space-section: clamp(4rem, 10vh, 8rem);
+  --yf-space-section: clamp(6rem, 14vh, 10rem);
+  --yf-navbar-height: 64px;
 
   /* ---- Layout ---- */
-  --yf-max-width: 1280px;
-  --yf-border-radius: 8px;
-  --yf-border-radius-lg: 16px;
+  --yf-max-width: none;
+  --yf-grid-margin: clamp(16px, 2.5vw, 40px);
 
-  /* ---- Transitions ---- */
+  /* ---- Motion (expo.out) ---- */
   --yf-ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --yf-duration: 0.6s;
+  --yf-ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --yf-duration: 0.8s;
   --yf-duration-fast: 0.3s;
 }

@@ -1,0 +1,119 @@
+/* ============================================
+   YAPPAFLOW PROMO — Industries / Platforms
+   Interactive hover list + visual card
+   ============================================ */
+
+.yf-industries {
+  border-top: 1px solid var(--yf-border);
+}
+
+.yf-ind-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--yf-space-3xl);
+  align-items: start;
+}
+
+.yf-ind-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.yf-ind-list .yf-label {
+  margin-bottom: var(--yf-space-xl);
+}
+
+.yf-ind-item {
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--yf-text-muted);
+  padding: 0.25em 0;
+  cursor: default;
+  transition:
+    color 0.4s var(--yf-ease),
+    font-weight 0.2s var(--yf-ease);
+}
+
+.yf-ind-item:hover,
+.yf-ind-item.active {
+  color: var(--yf-text);
+  font-weight: 700;
+}
+
+/* Right side: visual card */
+.yf-ind-visual {
+  position: sticky;
+  top: calc(var(--yf-navbar-height) + 2rem);
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: background 0.5s var(--yf-ease);
+  background: var(--yf-accent);
+}
+
+.yf-ind-visual-inner {
+  text-align: center;
+  color: #fff;
+  transition: opacity 0.4s var(--yf-ease);
+}
+
+.yf-ind-visual-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yf-ind-visual-icon svg {
+  width: 48px;
+  height: 48px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.yf-ind-visual-name {
+  font-size: var(--yf-text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.yf-ind-visual-desc {
+  font-size: var(--yf-text-sm);
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}
+
+/* Platform-specific colors */
+.yf-ind-visual[data-platform="shopify"] { background: #96BF48; }
+.yf-ind-visual[data-platform="wordpress"] { background: #21759B; }
+.yf-ind-visual[data-platform="webflow"] { background: #4353FF; }
+.yf-ind-visual[data-platform="ikas"] { background: var(--yf-accent); }
+.yf-ind-visual[data-platform="namecheap"] { background: #DE3723; }
+.yf-ind-visual[data-platform="hostinger"] { background: #673DE6; }
+.yf-ind-visual[data-platform="whatsapp"] { background: #25D366; }
+.yf-ind-visual[data-platform="instagram"] { background: #E1306C; }
+
+@media (max-width: 768px) {
+  .yf-ind-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .yf-ind-visual {
+    position: static;
+    aspect-ratio: 16 / 9;
+    order: -1;
+    margin-bottom: var(--yf-space-xl);
+  }
+
+  .yf-ind-item {
+    font-size: clamp(1.25rem, 5vw, 1.75rem);
+  }
+}

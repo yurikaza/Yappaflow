@@ -1,0 +1,58 @@
+/* ============================================
+   YAPPAFLOW PROMO — Loading Screen
+   ============================================ */
+
+.yf-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #FAFAF9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 var(--yf-grid-margin);
+  pointer-events: all;
+  transition: opacity 0.7s var(--yf-ease), transform 0.7s var(--yf-ease);
+}
+
+.yf-loader.yf-loader-exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.yf-loader-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.yf-loader-brand {
+  font-family: var(--yf-font);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--yf-text);
+  text-transform: uppercase;
+  overflow: hidden;
+}
+
+.yf-loader-brand-text {
+  display: block;
+  transform: translateY(100%);
+  animation: yf-loader-in 0.9s var(--yf-ease) 0.1s forwards;
+}
+
+.yf-loader-progress {
+  width: 0;
+  height: 1px;
+  background: var(--yf-accent);
+  animation: yf-loader-progress 0.9s var(--yf-ease) 0.2s forwards;
+}
+
+@keyframes yf-loader-in {
+  to { transform: translateY(0); }
+}
+
+@keyframes yf-loader-progress {
+  to { width: 120px; }
+}

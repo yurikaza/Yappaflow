@@ -1,6 +1,6 @@
 /* ============================================
    YAPPAFLOW PROMO — Waitlist Form Handler
-   Works with Squarespace native forms
+   Squarespace-ready with localStorage fallback
    ============================================ */
 
 (function () {
@@ -25,29 +25,73 @@
       if (btn) {
         btn.disabled = true;
         btn.textContent = 'Joining...';
+        btn.style.opacity = '0.7';
       }
 
-      // Simulate Squarespace form submission
-      // In production, this submits to Squarespace's /api/form/FormSubmission endpoint
-      // For now, it shows success after a brief delay
-      // Replace this with actual Squarespace form integration
-      setTimeout(function () {
-        // Success
-        form.style.display = 'none';
-        if (successEl) {
-          successEl.classList.add('yf-show');
+      // Try Squarespace native form submission
+      submitToSquarespace(email, function (success) {
+        if (success) {
+          showSuccess(form, successEl);
+        } else {
+          // Fallback: store locally and still show success
+          storeLocally(email);
+          showSuccess(form, successEl);
         }
-
-        // Store locally as backup
-        try {
-          var emails = JSON.parse(localStorage.getItem('yf_waitlist') || '[]');
-          emails.push({ email: email, date: new Date().toISOString() });
-          localStorage.setItem('yf_waitlist', JSON.stringify(emails));
-        } catch (err) {
-          // Silent fail
-        }
-      }, 1200);
+      });
     });
+  }
+
+  function submitToSquarespace(email, callback) {
+    // On Squarespace, the form submission endpoint is available
+    // via window.Static.SQUARESPACE_CONTEXT
+    var sqContext = window.Static && window.Static.SQUARESPACE_CONTEXT;
+
+    if (!sqContext) {
+      // Not on Squarespace (local preview) — fallback
+      callback(false);
+      return;
+    }
+
+    // Squarespace newsletter form submission
+    var formData = new FormData();
+    formData.append('email', email);
+
+    // Get CSRF token from Squarespace page
+    var crumb = sqContext.csrfToken || '';
+    if (crumb) {
+      formData.append('crumb', crumb);
+    }
+
+    fetch('/api/form/FormSubmission', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json'
+      },
+      body: formData
+    })
+    .then(function (res) {
+      callback(res.ok);
+    })
+    .catch(function () {
+      callback(false);
+    });
+  }
+
+  function storeLocally(email) {
+    try {
+      var emails = JSON.parse(localStorage.getItem('yf_waitlist') || '[]');
+      emails.push({ email: email, date: new Date().toISOString() });
+      localStorage.setItem('yf_waitlist', JSON.stringify(emails));
+    } catch (err) {
+      // Silent fail
+    }
+  }
+
+  function showSuccess(form, successEl) {
+    form.style.display = 'none';
+    if (successEl) {
+      successEl.classList.add('yf-show');
+    }
   }
 
   function isValidEmail(email) {

@@ -1,108 +1,70 @@
 /* ============================================
-   YAPPAFLOW PROMO — Footer CTA Section
+   YAPPAFLOW PROMO — Footer CTA (minimalist)
    ============================================ */
 
 .yf-footer-cta {
   border-top: 1px solid var(--yf-border);
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Radial glow */
-.yf-footer-cta::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1000px;
-  height: 500px;
-  background: radial-gradient(ellipse, rgba(0, 240, 255, 0.04) 0%, transparent 60%);
-  pointer-events: none;
 }
 
 .yf-footer-cta-content {
-  position: relative;
-  z-index: 1;
+  max-width: 100%;
 }
 
 .yf-footer-headline {
-  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-size: clamp(2rem, 4.5vw, 5rem);
   font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.0;
+  letter-spacing: -0.04em;
   margin-bottom: var(--yf-space-lg);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .yf-footer-sub {
-  font-size: var(--yf-text-lg);
+  font-size: var(--yf-text-base);
   color: var(--yf-text-secondary);
-  max-width: 500px;
-  margin: 0 auto var(--yf-space-2xl);
+  margin-bottom: var(--yf-space-2xl);
 }
 
-/* Large form variant */
-.yf-footer-form {
-  display: flex;
-  gap: var(--yf-space-sm);
-  max-width: 520px;
-  margin: 0 auto var(--yf-space-2xl);
+/* Mailto CTA */
+.yf-mailto-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 600;
+  color: var(--yf-accent);
+  border-bottom: 2px solid var(--yf-accent);
+  padding-bottom: 3px;
+  margin-bottom: var(--yf-space-md);
+  letter-spacing: -0.01em;
+  transition: color var(--yf-duration-fast) var(--yf-ease),
+              border-color var(--yf-duration-fast) var(--yf-ease),
+              gap var(--yf-duration-fast) var(--yf-ease);
 }
 
-.yf-footer-form .yf-input {
-  flex: 1;
-  padding: var(--yf-space-lg) var(--yf-space-xl);
-  background: var(--yf-bg-card);
-  border: 1px solid var(--yf-border);
-  border-radius: var(--yf-border-radius);
-  color: var(--yf-text-primary);
-  font-family: var(--yf-font-body);
-  font-size: var(--yf-text-lg);
-  outline: none;
-  transition: border-color var(--yf-duration-fast) ease, box-shadow var(--yf-duration-fast) ease;
+.yf-mailto-cta:hover {
+  color: var(--yf-accent-hover);
+  border-color: var(--yf-accent-hover);
+  gap: 0.8rem;
 }
 
-.yf-footer-form .yf-input::placeholder {
-  color: var(--yf-text-muted);
+.yf-mailto-cta svg {
+  transition: transform var(--yf-duration-fast) var(--yf-ease);
 }
 
-.yf-footer-form .yf-input:focus {
-  border-color: var(--yf-accent);
-  box-shadow: 0 0 0 3px var(--yf-accent-dim);
+.yf-mailto-cta:hover svg {
+  transform: translateX(4px);
 }
 
-.yf-footer-form .yf-btn-primary {
-  padding: var(--yf-space-lg) var(--yf-space-2xl);
-  font-size: var(--yf-text-lg);
-}
-
-/* Social proof */
-.yf-social-proof {
-  font-family: var(--yf-font-mono);
+.yf-mailto-hint {
   font-size: var(--yf-text-sm);
   color: var(--yf-text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--yf-space-sm);
-  margin-bottom: var(--yf-space-4xl);
-}
-
-.yf-social-proof-dot {
-  width: 6px;
-  height: 6px;
-  background: #22c55e;
-  border-radius: 50%;
-  animation: yf-pulse-dot 2s ease-in-out infinite;
+  margin-bottom: 0;
 }
 
 /* Minimal Footer */
 .yf-mini-footer {
   border-top: 1px solid var(--yf-border);
+  margin-top: var(--yf-space-4xl);
   padding: var(--yf-space-xl) 0;
   display: flex;
   align-items: center;
@@ -111,25 +73,23 @@
   color: var(--yf-text-muted);
 }
 
+.yf-mini-footer a {
+  color: var(--yf-text-muted);
+  transition: color var(--yf-duration-fast) ease;
+}
+
+.yf-mini-footer a:hover {
+  color: var(--yf-text);
+}
+
 .yf-mini-footer-links {
   display: flex;
   gap: var(--yf-space-xl);
 }
 
-.yf-mini-footer-links a {
-  color: var(--yf-text-muted);
-  font-size: var(--yf-text-sm);
-  transition: color var(--yf-duration-fast) ease;
-}
-
-.yf-mini-footer-links a:hover {
-  color: var(--yf-text-primary);
-}
-
 .yf-footer-brand {
-  font-family: var(--yf-font-display);
   font-weight: 700;
-  color: var(--yf-text-primary);
+  color: var(--yf-text);
 }
 
 @media (max-width: 640px) {

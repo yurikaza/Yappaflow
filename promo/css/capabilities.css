@@ -1,0 +1,92 @@
+/* ============================================
+   YAPPAFLOW PROMO — Capabilities Section
+   Statement + Listen/Build/Ship pillars
+   ============================================ */
+
+.yf-capabilities {
+  border-top: 1px solid var(--yf-border);
+}
+
+.yf-caps-statement {
+  font-size: clamp(2.5rem, 5.5vw, 6rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  max-width: 100%;
+  margin-bottom: var(--yf-space-2xl);
+  color: var(--yf-text);
+}
+
+.yf-caps-buttons {
+  display: flex;
+  gap: var(--yf-space-md);
+  margin-bottom: var(--yf-space-4xl);
+}
+
+/* Three pillars grid */
+.yf-caps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+
+.yf-caps-card {
+  border-top: 1px solid var(--yf-border);
+  padding: var(--yf-space-2xl) var(--yf-space-xl) var(--yf-space-2xl) 0;
+}
+
+.yf-caps-card:not(:last-child) {
+  border-right: 1px solid var(--yf-border);
+  padding-right: var(--yf-space-xl);
+}
+
+.yf-caps-card:not(:first-child) {
+  padding-left: var(--yf-space-xl);
+}
+
+.yf-caps-number {
+  font-family: var(--yf-font-mono);
+  font-size: var(--yf-text-xs);
+  color: var(--yf-text-muted);
+  margin-bottom: var(--yf-space-lg);
+  letter-spacing: 0.05em;
+}
+
+.yf-caps-title {
+  font-size: var(--yf-text-2xl);
+  font-weight: 400;
+  color: var(--yf-text);
+  margin-bottom: var(--yf-space-md);
+  letter-spacing: -0.02em;
+}
+
+.yf-caps-desc {
+  font-size: var(--yf-text-sm);
+  color: var(--yf-text-secondary);
+  line-height: 1.7;
+  max-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .yf-caps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .yf-caps-card:not(:last-child) {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .yf-caps-card:not(:first-child) {
+    padding-left: 0;
+  }
+
+  .yf-caps-buttons {
+    flex-direction: column;
+  }
+
+  .yf-caps-buttons .yf-btn {
+    text-align: center;
+    justify-content: center;
+  }
+}
