@@ -66,7 +66,10 @@ export const platformResolvers = {
         phoneNumberId = phone.id;
         displayPhone  = phone.display_phone_number ?? "";
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Invalid WhatsApp Business token";
+        const metaMsg = (err as { response?: { data?: { error?: { message?: string } } } })
+          ?.response?.data?.error?.message;
+        const msg = metaMsg ?? (err instanceof Error ? err.message : "Invalid WhatsApp Business token");
+        logError("connectWhatsApp Meta API error", err);
         throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
       }
 
