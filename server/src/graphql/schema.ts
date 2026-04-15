@@ -161,6 +161,7 @@ export const typeDefs = `#graphql
 
   input ConnectWhatsAppInput {
     accessToken: String!
+    wabaId: String
   }
 
   input ConnectWhatsAppEmbeddedInput {

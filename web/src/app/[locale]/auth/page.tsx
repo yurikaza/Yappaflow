@@ -341,6 +341,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
   const [connected, setConnected]  = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [manualToken, setManualToken] = useState("");
+  const [manualWabaId, setManualWabaId] = useState("");
   const [showToken, setShowToken]  = useState(false);
   const ready = true; // No FB SDK needed — we use redirect flow
 
@@ -401,7 +402,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
     if (!manualToken) { setErr("Please paste your access token"); return; }
     setLoading(true); setErr("");
     try {
-      await connectWhatsApp({ accessToken: manualToken }, token);
+      await connectWhatsApp({ accessToken: manualToken, ...(manualWabaId ? { wabaId: manualWabaId } : {}) }, token);
       setConnected(true);
       setTimeout(onDone, 1500);
     } catch (e: unknown) {
@@ -510,6 +511,16 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
               <button onClick={() => setShowToken((v) => !v)} className="text-white/15 hover:text-white/30">
                 {showToken ? <EyeOff size={11} /> : <Eye size={11} />}
               </button>
+            </div>
+            <div className="rounded-lg border border-white/[0.05] bg-[#111114] px-3">
+              <input
+                type="text"
+                value={manualWabaId}
+                onChange={(e) => setManualWabaId(e.target.value)}
+                placeholder="WABA ID (from Meta Business Settings)"
+                className="w-full bg-transparent py-2 text-[11px] font-mono text-white outline-none"
+                autoComplete="off"
+              />
             </div>
             <button onClick={handleManualConnect} disabled={loading}
               className="w-full rounded-lg bg-white/[0.06] py-2 text-[11px] font-semibold text-white/40 hover:bg-white/[0.08] disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5">

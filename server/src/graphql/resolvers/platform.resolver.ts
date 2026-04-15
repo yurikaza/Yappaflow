@@ -40,69 +40,55 @@ export const platformResolvers = {
     /** Connect WhatsApp Business — auto-detects WABA ID and phone number from token */
     connectWhatsApp: async (
       _: unknown,
-      { input }: { input: { accessToken: string } },
+      { input }: { input: { accessToken: string; wabaId?: string } },
       ctx: AuthContext
     ) => {
       if (!ctx.userId) throw new GraphQLError("Unauthorized", { extensions: { code: "UNAUTHORIZED" } });
 
-      let wabaId: string | undefined, phoneNumberId: string, displayPhone: string;
+      let wabaId: string | undefined = input.wabaId, phoneNumberId: string, displayPhone: string;
       try {
-        const appToken = `${env.metaAppId}|${env.metaAppSecret}`;
+        if (wabaId) {
+          log(`WA: using provided WABA ${wabaId}`);
+        } else {
+          // Auto-discover WABA from token
+          const appToken = `${env.metaAppId}|${env.metaAppSecret}`;
 
-        // Strategy 1: debug_token granular_scopes (works for Embedded Signup tokens)
-        try {
-          const { data: debugData } = await axios.get(
-            "https://graph.facebook.com/v21.0/debug_token",
-            { params: { input_token: input.accessToken, access_token: appToken } }
-          );
-          const granularScopes = debugData.data?.granular_scopes ?? [];
-          const wabaScope = granularScopes.find(
-            (s: { scope: string; target_ids?: string[] }) => s.scope === "whatsapp_business_management"
-          );
-          wabaId = wabaScope?.target_ids?.[0];
-          if (wabaId) log(`WA: discovered WABA ${wabaId} via debug_token`);
-          else log("WA: debug_token has no target_ids, trying business discovery. scopes: " + JSON.stringify(granularScopes));
-        } catch (e) {
-          log("WA: debug_token failed, trying business discovery");
-        }
-
-        // Strategy 2: business discovery (works for System User tokens)
-        if (!wabaId) {
+          // Strategy 1: debug_token granular_scopes
           try {
-            const { data: bizRes } = await axios.get(
-              "https://graph.facebook.com/v21.0/me/businesses",
-              { params: { access_token: input.accessToken } }
+            const { data: debugData } = await axios.get(
+              "https://graph.facebook.com/v21.0/debug_token",
+              { params: { input_token: input.accessToken, access_token: appToken } }
             );
-            const bizId = bizRes.data?.[0]?.id;
-            if (bizId) {
-              const { data: wabaRes } = await axios.get(
-                `https://graph.facebook.com/v21.0/${bizId}/owned_whatsapp_business_accounts`,
+            const granularScopes = debugData.data?.granular_scopes ?? [];
+            const wabaScope = granularScopes.find(
+              (s: { scope: string; target_ids?: string[] }) => s.scope === "whatsapp_business_management"
+            );
+            wabaId = wabaScope?.target_ids?.[0];
+            if (wabaId) log(`WA: discovered WABA ${wabaId} via debug_token`);
+          } catch { /* continue to next strategy */ }
+
+          // Strategy 2: business discovery
+          if (!wabaId) {
+            try {
+              const { data: bizRes } = await axios.get(
+                "https://graph.facebook.com/v21.0/me/businesses",
                 { params: { access_token: input.accessToken } }
               );
-              wabaId = wabaRes.data?.[0]?.id;
-              if (wabaId) log(`WA: discovered WABA ${wabaId} via business ${bizId}`);
-            }
-          } catch (e) {
-            log("WA: business discovery failed, trying direct WABA listing");
+              const bizId = bizRes.data?.[0]?.id;
+              if (bizId) {
+                const { data: wabaRes } = await axios.get(
+                  `https://graph.facebook.com/v21.0/${bizId}/owned_whatsapp_business_accounts`,
+                  { params: { access_token: input.accessToken } }
+                );
+                wabaId = wabaRes.data?.[0]?.id;
+                if (wabaId) log(`WA: discovered WABA ${wabaId} via business ${bizId}`);
+              }
+            } catch { /* continue */ }
           }
-        }
 
-        // Strategy 3: direct listing (might work for some token types)
-        if (!wabaId) {
-          try {
-            const { data: wabaRes } = await axios.get(
-              "https://graph.facebook.com/v21.0/me/whatsapp_business_accounts",
-              { params: { access_token: input.accessToken } }
-            );
-            wabaId = wabaRes.data?.[0]?.id;
-            if (wabaId) log(`WA: discovered WABA ${wabaId} via direct listing`);
-          } catch {
-            // Expected to fail for most token types
+          if (!wabaId) {
+            throw new Error("Could not auto-detect your WABA. Please enter your WABA ID alongside the token.");
           }
-        }
-
-        if (!wabaId) {
-          throw new Error("Could not find a WhatsApp Business Account. Make sure your System User has the WABA assigned as an asset with Full Control.");
         }
 
         // Get phone numbers under the WABA

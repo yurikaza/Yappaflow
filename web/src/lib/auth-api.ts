@@ -106,7 +106,7 @@ export function getInstagramAuthUrl() {
 
 const PLATFORM_FIELDS = `id platform displayPhone igUsername createdAt`;
 
-export async function connectWhatsApp(input: { accessToken: string }, token: string) {
+export async function connectWhatsApp(input: { accessToken: string; wabaId?: string }, token: string) {
   return gql(
     `mutation ConnectWhatsApp($input: ConnectWhatsAppInput!) {
       connectWhatsApp(input: $input) { ${PLATFORM_FIELDS} }
