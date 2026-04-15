@@ -388,7 +388,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
           const embedded = embeddedDataRef.current;
           if (!embedded?.waba_id || !embedded?.phone_number_id) {
             setLoading(false);
-            setErr("Could not complete setup. Please try again.");
+            setErr("Could not receive data from Meta. Please disable your ad blocker, allow pop-ups for this site, and try again.");
             return;
           }
 
@@ -474,11 +474,26 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
         ))}
       </div>
 
+      {/* Browser requirements notice */}
+      <div className="mt-5 rounded-lg bg-amber-500/5 border border-amber-500/10 px-4 py-3">
+        <p className="text-[11px] text-amber-400/80 font-semibold mb-1">Before you continue:</p>
+        <ul className="text-[11px] text-amber-400/60 space-y-1 list-none">
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">1.</span>
+            <span><strong>Allow pop-ups</strong> for this site — Meta opens a login window</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">2.</span>
+            <span><strong>Disable ad blocker</strong> if you have one — it blocks Meta&apos;s login</span>
+          </li>
+        </ul>
+      </div>
+
       {/* Primary CTA: Continue with Meta */}
       <button
         onClick={handleContinueWithMeta}
         disabled={loading || !ready}
-        className="mt-6 w-full flex items-center justify-center gap-3 rounded-lg py-3.5 font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 text-sm"
+        className="mt-4 w-full flex items-center justify-center gap-3 rounded-lg py-3.5 font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 text-sm"
         style={{ background: "linear-gradient(135deg, #0078FF, #00C6FF)" }}
       >
         {loading ? (
