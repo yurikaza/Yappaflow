@@ -386,7 +386,7 @@ function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => v
         })();
       },
       {
-        scope: "whatsapp_business_management,whatsapp_business_messaging,business_management",
+        scope: "whatsapp_business_management,whatsapp_business_messaging",
         response_type: "token",
         override_default_response_type: true,
       }
