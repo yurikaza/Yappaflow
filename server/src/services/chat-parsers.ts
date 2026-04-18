@@ -31,19 +31,43 @@ export interface ParsedChat {
  *   1/15/24, 2:30:45 PM - John Doe: Hello there
  *   15/01/2024, 14:30:45 - John Doe: Hello there
  *   [15.01.2024, 14:30:45] John Doe: Hello there
+ *   15.04.2024 14:30 - John Doe: Merhaba         (Turkish Android, no comma)
+ *
+ * iOS exports embed invisible bidi / narrow-space characters (U+200E, U+202F)
+ * around timestamps — `normalizeWhatsAppContent()` strips them first.
  *
  * Multi-line messages: continuation lines don't start with a date pattern.
  */
 
-// Matches various WhatsApp date formats at line start
+// Matches various WhatsApp date formats at line start.
+// Date and time may be separated by optional comma + any whitespace.
 const WA_LINE_RE =
-  /^\[?(\d{1,4}[\/.]\d{1,2}[\/.]\d{2,4},?\s+\d{1,2}[:.]\d{2}(?:[:.]\d{2})?\s*(?:AM|PM|am|pm)?)\]?\s*[-–—]?\s*(.+?):\s([\s\S]*)/;
+  /^\[?(\d{1,4}[\/.\-]\d{1,2}[\/.\-]\d{2,4},?\s+\d{1,2}[:.]\d{2}(?:[:.]\d{2})?\s*(?:AM|PM|am|pm)?)\]?\s*[-–—:]?\s*(.+?):\s([\s\S]*)/;
 
 // System messages (encryption notices, group changes, etc.)
 const WA_SYSTEM_RE =
-  /^\[?(\d{1,4}[\/.]\d{1,2}[\/.]\d{2,4},?\s+\d{1,2}[:.]\d{2}(?:[:.]\d{2})?\s*(?:AM|PM|am|pm)?)\]?\s*[-–—]?\s*(.+)/;
+  /^\[?(\d{1,4}[\/.\-]\d{1,2}[\/.\-]\d{2,4},?\s+\d{1,2}[:.]\d{2}(?:[:.]\d{2})?\s*(?:AM|PM|am|pm)?)\]?\s*[-–—:]?\s*(.+)/;
+
+/**
+ * WhatsApp exports (especially iOS) contain invisible Unicode characters
+ * that break naive regex matching:
+ *   - U+FEFF  BOM at file start
+ *   - U+200E  Left-to-Right Mark (LRM)
+ *   - U+200F  Right-to-Left Mark (RLM)
+ *   - U+202A-U+202E  LRE/RLE/PDF/LRO/RLO
+ *   - U+2066-U+2069  LRI/RLI/FSI/PDI (isolates)
+ *   - U+00A0  Non-breaking space (used between time and sender)
+ *   - U+202F  Narrow no-break space (French/iOS, used before AM/PM)
+ */
+function normalizeWhatsAppContent(content: string): string {
+  return content
+    .replace(/^\uFEFF/, "")                                       // strip BOM
+    .replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, "")    // strip bidi controls
+    .replace(/[\u00A0\u202F]/g, " ");                            // normalize non-breaking spaces
+}
 
 export function parseWhatsApp(content: string): ParsedChat {
+  content = normalizeWhatsAppContent(content);
   const lines = content.split(/\r?\n/);
   const messages: ParsedMessage[] = [];
   const participants = new Set<string>();
@@ -310,11 +334,15 @@ export function detectPlatform(
     return "other";
   }
 
-  // WhatsApp .txt export — check for date pattern
+  // WhatsApp .txt export — scan first N lines (normalized) for a date pattern
   if (lower.endsWith(".txt")) {
-    const firstLines = content.slice(0, 500);
-    if (WA_LINE_RE.test(firstLines) || WA_SYSTEM_RE.test(firstLines)) {
-      return "whatsapp";
+    const normalized = normalizeWhatsAppContent(content);
+    const firstLines = normalized.split(/\r?\n/, 30);
+    for (const line of firstLines) {
+      if (!line.trim()) continue;
+      if (WA_LINE_RE.test(line) || WA_SYSTEM_RE.test(line)) {
+        return "whatsapp";
+      }
     }
   }
 
@@ -329,15 +357,34 @@ export function parseFile(filename: string, content: string): ParsedChat {
     case "instagram": return parseInstagramJSON(content);
     case "telegram":  return parseTelegramJSON(content);
     case "csv":       return parseCSV(content);
-    default:
-      // Try WhatsApp format as fallback for unknown .txt
+    default: {
+      // Try WhatsApp format as fallback for unknown .txt (parser will normalize)
       if (filename.toLowerCase().endsWith(".txt")) {
         const result = parseWhatsApp(content);
         if (result.messages.length > 0) return result;
       }
+
+      // Build a diagnostic peek at the file so failures are debuggable.
+      // First non-empty line with any bidi/BOM chars made visible.
+      const peekLine = content
+        .split(/\r?\n/)
+        .find((l) => l.trim())
+        ?.slice(0, 120) ?? "";
+      const hex = peekLine
+        .slice(0, 40)
+        .split("")
+        .map((c) => {
+          const code = c.charCodeAt(0);
+          return code < 32 || code > 126 ? `\\u${code.toString(16).padStart(4, "0")}` : c;
+        })
+        .join("");
+      console.warn(`[chat-parsers] parseFile: unable to detect format for "${filename}". First line: ${JSON.stringify(peekLine)} (escaped: ${hex})`);
+
       throw new Error(
-        `Unsupported file format. Please upload a WhatsApp .txt, Instagram JSON, Telegram JSON, or CSV file.`
+        `Unsupported file format. We couldn't detect a WhatsApp, Instagram, Telegram, or CSV pattern in "${filename}". ` +
+        `Make sure you exported "Without Media" from WhatsApp, or check the format matches one of the supported types.`
       );
+    }
   }
 }
 
