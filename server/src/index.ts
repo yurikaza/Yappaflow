@@ -54,7 +54,7 @@ async function main() {
   const apolloServer = createApolloServer();
   await apolloServer.start();
 
-  // Apollo Server v4 with Express 4/5 — cors + json must be inline per route
+  // Apollo Server v5 with Express 5 — cors + json must be inline per route
   app.use(
     "/graphql",
     cors(corsOptions),
