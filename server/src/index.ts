@@ -95,7 +95,7 @@ async function main() {
     log(`   Test full    → curl -X POST ${base}/ai/debug/test -H "Content-Type: application/json" -d '{"scenario":"tech-startup","mode":"full"}'`);
     log(`   Sessions    → GET ${base}/ai/debug/sessions`);
     log(`   Cleanup     → DELETE ${base}/ai/debug/cleanup`);
-    log(`   Scenarios: fashion-ecommerce, restaurant, tech-startup`);
+    log(`   Scenarios: fashion-ecommerce, restaurant, tech-startup, turkish-cosmetics`);
     log(`\n💡 For local testing, expose this server with:`);
     log(`   npx ngrok http ${env.port}`);
     log(`   Then use the ngrok URL for webhook registration.\n`);
