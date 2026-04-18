@@ -143,6 +143,25 @@ router.post("/chat", upload.single("file"), async (req, res) => {
 
     log(`   Parsed: ${parsed.messages.length} messages, ${parsed.participants.length} participants, platform=${parsed.platform}`);
 
+    // If an ownerName is now provided, clean up any orphan signal from a prior
+    // import where the owner was treated as a separate participant (e.g. user
+    // forgot to fill in their name on the first upload). This keeps re-imports
+    // idempotent and gives a clean single-thread chat.
+    if (ownerName) {
+      const escaped = ownerName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const orphan = await Signal.findOne({
+        agencyId: userId,
+        platform: parsed.platform,
+        source:   "import",
+        sender:   { $regex: `^${escaped}$`, $options: "i" },
+      });
+      if (orphan) {
+        await ChatMessage.deleteMany({ signalId: orphan._id });
+        await Signal.deleteOne({ _id: orphan._id });
+        log(`   Cleaned up orphan owner signal for "${ownerName}" (was ${orphan._id})`);
+      }
+    }
+
     // Group messages by sender to create one Signal per conversation partner
     const bySender = new Map<string, typeof parsed.messages>();
     for (const msg of parsed.messages) {
@@ -204,7 +223,14 @@ router.post("/chat", upload.single("file"), async (req, res) => {
         signalsCreated++;
         log(`   New signal: ${signal._id} from "${senderName}"`);
       } else {
-        await Signal.findByIdAndUpdate(signal._id, { preview, status: "new" });
+        // Re-import: wipe prior messages on this signal so we don't duplicate.
+        // Only touches messages from previous imports (externalId starts with "import-").
+        const deleted = await ChatMessage.deleteMany({
+          signalId:   signal._id,
+          externalId: { $regex: "^import-" },
+        });
+        log(`   Re-import: cleared ${deleted.deletedCount} prior messages from signal ${signal._id}`);
+        await Signal.findByIdAndUpdate(signal._id, { preview, status: "new", importedAt: new Date() });
       }
 
       // Insert messages (deduplicated by externalId)
