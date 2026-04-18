@@ -30,6 +30,57 @@ function sanitize(text: string, maxLen = 10_000): string {
     .slice(0, maxLen);
 }
 
+/**
+ * Detect file encoding from BOM or byte-pattern heuristics.
+ * WhatsApp exports from Windows/iOS sometimes come as UTF-16 LE/BE which,
+ * if read as UTF-8, produces garbage that no regex can match.
+ */
+function decodeBuffer(buf: Buffer): { text: string; encoding: string } {
+  // BOM-based detection
+  if (buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) {
+    return { text: buf.slice(3).toString("utf8"), encoding: "utf-8-bom" };
+  }
+  if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) {
+    return { text: buf.slice(2).toString("utf16le"), encoding: "utf-16-le" };
+  }
+  if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
+    // UTF-16 BE — Node doesn't ship BE natively, swap bytes then decode as LE
+    const swapped = Buffer.alloc(buf.length - 2);
+    for (let i = 2; i < buf.length - 1; i += 2) {
+      swapped[i - 2] = buf[i + 1];
+      swapped[i - 1] = buf[i];
+    }
+    return { text: swapped.toString("utf16le"), encoding: "utf-16-be" };
+  }
+
+  // Heuristic: if many null bytes in even positions, likely UTF-16 LE without BOM
+  const sampleLen = Math.min(buf.length, 512);
+  let evenNulls = 0;
+  let oddNulls  = 0;
+  for (let i = 0; i < sampleLen; i++) {
+    if (buf[i] === 0x00) {
+      if (i % 2 === 0) evenNulls++;
+      else oddNulls++;
+    }
+  }
+  const nullRatio = (evenNulls + oddNulls) / sampleLen;
+  if (nullRatio > 0.25) {
+    // Lots of nulls → UTF-16
+    if (oddNulls > evenNulls) {
+      return { text: buf.toString("utf16le"), encoding: "utf-16-le-heuristic" };
+    } else {
+      const swapped = Buffer.alloc(buf.length);
+      for (let i = 0; i < buf.length - 1; i += 2) {
+        swapped[i]     = buf[i + 1];
+        swapped[i + 1] = buf[i];
+      }
+      return { text: swapped.toString("utf16le"), encoding: "utf-16-be-heuristic" };
+    }
+  }
+
+  return { text: buf.toString("utf8"), encoding: "utf-8" };
+}
+
 const router: import("express").Router = Router();
 
 // Accept files up to 25 MB, stored in memory (chat exports are text-based, small)
@@ -72,9 +123,9 @@ router.post("/chat", upload.single("file"), async (req, res) => {
 
     const ownerName = (req.body.ownerName as string)?.trim() ?? "";
     const filename  = req.file.originalname;
-    const content   = req.file.buffer.toString("utf-8");
+    const { text: content, encoding } = decodeBuffer(req.file.buffer);
 
-    log(`📥 Chat import: ${filename} (${(req.file.size / 1024).toFixed(1)} KB) by user ${userId}`);
+    log(`📥 Chat import: ${filename} (${(req.file.size / 1024).toFixed(1)} KB, encoding=${encoding}) by user ${userId}`);
 
     // Parse the file
     let parsed;
