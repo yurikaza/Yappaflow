@@ -17,10 +17,12 @@ export interface IPlatformConnection extends Document {
   igUsername?:   string;
 
   // Common
-  accessToken:   string;   // Meta access token (never expose to client)
-  isActive:      boolean;
-  createdAt:     Date;
-  updatedAt:     Date;
+  accessToken:        string;   // Encrypted Meta access token (ciphertext hex)
+  accessTokenIv?:     string;   // AES-GCM IV (hex) — present when encrypted
+  accessTokenKeyId?:  string;   // Encryption key version — present when encrypted
+  isActive:           boolean;
+  createdAt:          Date;
+  updatedAt:          Date;
 }
 
 const PlatformConnectionSchema = new Schema<IPlatformConnection>(
@@ -33,8 +35,10 @@ const PlatformConnectionSchema = new Schema<IPlatformConnection>(
     igAccountId:  { type: String },
     igUserId:     { type: String },
     igUsername:   { type: String },
-    accessToken:  { type: String, required: true },
-    isActive:     { type: Boolean, default: true },
+    accessToken:       { type: String, required: true },
+    accessTokenIv:     { type: String },
+    accessTokenKeyId:  { type: String },
+    isActive:          { type: Boolean, default: true },
   },
   { timestamps: true }
 );

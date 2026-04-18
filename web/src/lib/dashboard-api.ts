@@ -48,12 +48,13 @@ async function gql<T>(query: string, variables?: Record<string, unknown>): Promi
 
 export interface Signal {
   id:            string;
-  platform:      "whatsapp" | "instagram";
+  platform:      "whatsapp" | "instagram" | "telegram" | "csv" | "other";
   sender:        string;
   senderName:    string;
   preview:       string;
   isOnDashboard: boolean;
   status:        "new" | "in_progress" | "converted" | "ignored";
+  source?:       "webhook" | "import" | "api";
   createdAt:     string;
 }
 
@@ -283,4 +284,37 @@ export async function importPlatformMessages(platform: string): Promise<ImportRe
     { platform }
   );
   return data.importPlatformMessages;
+}
+
+// ── Chat file import ──────────────────────────────────────────────────────────
+
+export interface ChatImportResult {
+  success:         boolean;
+  signalsCreated:  number;
+  messagesCreated: number;
+  platform:        string;
+  participants:    string[];
+  encrypted:       boolean;
+}
+
+export async function uploadChatFile(
+  file: File,
+  ownerName?: string
+): Promise<ChatImportResult> {
+  const token = getToken();
+  if (!token) throw new Error("Not authenticated");
+
+  const form = new FormData();
+  form.append("file", file);
+  if (ownerName) form.append("ownerName", ownerName);
+
+  const res = await fetch(`${getApiBase()}/import/chat`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error ?? "Import failed");
+  return json;
 }

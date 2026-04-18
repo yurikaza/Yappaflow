@@ -10,6 +10,7 @@ import {
   importInstagramConversations,
   importWhatsAppConversations,
 } from "../../services/import-conversations.service";
+import { decryptText, isEncryptionEnabled, encryptAccessToken, decryptAccessToken } from "../../services/encryption.service";
 
 export const platformResolvers = {
   Query: {
@@ -29,10 +30,11 @@ export const platformResolvers = {
       const signal = await Signal.findOne({ _id: signalId, agencyId: ctx.userId });
       if (!signal) throw new GraphQLError("Signal not found", { extensions: { code: "NOT_FOUND" } });
 
+      const cappedLimit = Math.min(Math.max(limit, 1), 200); // cap at 200
       const docs = await ChatMessage.find({ signalId })
         .sort({ timestamp: 1 })
-        .limit(limit);
-      return docs.map(serializeMsg);
+        .limit(cappedLimit);
+      return docs.map((d) => serializeMsg(d, ctx.userId));
     },
   },
 
@@ -108,6 +110,7 @@ export const platformResolvers = {
         throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
       }
 
+      const encToken = encryptAccessToken(input.accessToken, ctx.userId);
       const doc = await PlatformConnection.findOneAndUpdate(
         { userId: ctx.userId, platform: "whatsapp_business" },
         {
@@ -117,7 +120,7 @@ export const platformResolvers = {
             wabaId,
             phoneNumberId,
             displayPhone,
-            accessToken:   input.accessToken,
+            ...encToken,
             isActive:      true,
           },
         },
@@ -236,7 +239,8 @@ export const platformResolvers = {
         }
       }
 
-      // 3. Upsert PlatformConnection
+      // 3. Upsert PlatformConnection (encrypt token at rest)
+      const encToken = encryptAccessToken(accessToken, ctx.userId);
       const doc = await PlatformConnection.findOneAndUpdate(
         { userId: ctx.userId, platform: "whatsapp_business" },
         {
@@ -246,7 +250,7 @@ export const platformResolvers = {
             wabaId,
             phoneNumberId,
             displayPhone,
-            accessToken,
+            ...encToken,
             isActive:      true,
           },
         },
@@ -306,6 +310,7 @@ export const platformResolvers = {
         throw new GraphQLError(msg, { extensions: { code: "BAD_USER_INPUT" } });
       }
 
+      const encToken = encryptAccessToken(accessToken, ctx.userId);
       const doc = await PlatformConnection.findOneAndUpdate(
         { userId: ctx.userId, platform: "instagram_dm" },
         {
@@ -315,7 +320,7 @@ export const platformResolvers = {
             igAccountId: igData.instagram_business_account?.id ?? igData.id,
             igUserId:    igData.id,
             igUsername:  igData.username,
-            accessToken,
+            ...encToken,
             isActive:    true,
           },
         },
@@ -361,7 +366,7 @@ export const platformResolvers = {
             type:    "text",
             text:    { body: text },
           },
-          { headers: { Authorization: `Bearer ${conn.accessToken}`, "Content-Type": "application/json" } }
+          { headers: { Authorization: `Bearer ${decryptAccessToken(conn)}`, "Content-Type": "application/json" } }
         );
         externalId = data.messages?.[0]?.id ?? `local_${Date.now()}`;
       } catch (err: unknown) {
@@ -430,7 +435,18 @@ function serializeConn(doc: InstanceType<typeof PlatformConnection>) {
   };
 }
 
-function serializeMsg(doc: InstanceType<typeof ChatMessage>) {
+function serializeMsg(doc: InstanceType<typeof ChatMessage>, userId?: string) {
+  let text = doc.text;
+
+  // Decrypt if the message is encrypted and we have the user context
+  if ((doc as Record<string, unknown>).encrypted && (doc as Record<string, unknown>).iv && userId && isEncryptionEnabled()) {
+    try {
+      text = decryptText(doc.text, (doc as Record<string, unknown>).iv as string, userId);
+    } catch {
+      text = "[encrypted — unable to decrypt]";
+    }
+  }
+
   return {
     id:           doc._id.toString(),
     signalId:     doc.signalId.toString(),
@@ -438,9 +454,10 @@ function serializeMsg(doc: InstanceType<typeof ChatMessage>) {
     direction:    doc.direction,
     senderName:   doc.senderName,
     senderHandle: doc.senderHandle,
-    text:         doc.text,
+    text,
     messageType:  doc.messageType,
     mediaUrl:     doc.mediaUrl ?? null,
+    encrypted:    (doc as Record<string, unknown>).encrypted ?? false,
     timestamp:    doc.timestamp.toISOString(),
   };
 }

@@ -95,11 +95,15 @@ function serialize(doc: InstanceType<typeof Signal>) {
   return {
     id:            doc._id.toString(),
     platform:      doc.platform,
+    source:        (doc as Record<string, unknown>).source ?? null,
     sender:        doc.sender,
     senderName:    doc.senderName,
     preview:       doc.preview,
     isOnDashboard: doc.isOnDashboard,
     status:        doc.status,
+    importedAt:    (doc as Record<string, unknown>).importedAt
+                     ? (doc as Record<string, unknown> & { importedAt: Date }).importedAt.toISOString()
+                     : null,
     createdAt:     doc.createdAt.toISOString(),
     updatedAt:     doc.updatedAt.toISOString(),
   };

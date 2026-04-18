@@ -131,11 +131,13 @@ export const typeDefs = `#graphql
   type Signal {
     id:            ID!
     platform:      String!
+    source:        String
     sender:        String!
     senderName:    String!
     preview:       String!
     isOnDashboard: Boolean!
     status:        String!
+    importedAt:    String
     createdAt:     String!
     updatedAt:     String!
   }
@@ -182,6 +184,7 @@ export const typeDefs = `#graphql
     text:         String!
     messageType:  String!
     mediaUrl:     String
+    encrypted:    Boolean
     timestamp:    String!
   }
 

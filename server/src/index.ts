@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { expressMiddleware } from "@as-integrations/express5";
 import { createApolloServer } from "./graphql";
 import { connectDatabase } from "./config/db";
@@ -13,6 +15,7 @@ import webhooksRouter  from "./routes/webhooks.route";
 import sseRouter       from "./routes/sse.route";
 import aiStreamRouter  from "./routes/ai-stream.route";
 import aiDebugRouter   from "./routes/ai-debug.route";
+import chatImportRouter from "./routes/chat-import.route";
 
 // Accept requests from any localhost port in dev, or the configured frontend URL in prod
 const allowedOrigins = [
@@ -26,8 +29,9 @@ const allowedOrigins = [
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    // No Origin header → not a browser cross-origin request (mobile apps, curl, server-to-server).
+    // In dev: set CORS headers (Postman/testing). In prod: allow through but skip CORS headers.
+    if (!origin) return callback(null, env.nodeEnv !== "production");
     if (allowedOrigins.includes(origin)) return callback(null, true);
     // Allow ngrok tunnels (*.ngrok-free.dev, *.ngrok.io) in dev
     if (env.nodeEnv !== "production" && origin && (origin.includes(".ngrok-free.dev") || origin.includes(".ngrok.io"))) {
@@ -41,15 +45,51 @@ const corsOptions: cors.CorsOptions = {
 async function main() {
   const app = express();
 
+  // ── Security hardening ─────────────────────────────────────────────────────
+  app.use(helmet({ contentSecurityPolicy: false })); // CSP off for GraphQL playground
   app.use(cookieParser());
+
+  // Rate limiters
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100,                  // 100 requests per window per IP
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests — please try again later" },
+  });
+  const uploadLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,                    // 20 file uploads per 15 min
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many uploads — please try again later" },
+  });
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 30,                    // 30 auth attempts per 15 min
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many login attempts — please try again later" },
+  });
+
+  // Warn on insecure defaults
+  if (env.jwtSecret === "dev-secret-change-in-production" || env.jwtSecret === "your-super-secret-jwt-key-change-this") {
+    log("\n⚠️  WARNING: JWT_SECRET is a default placeholder — set a random 256-bit key in .env for production!");
+    log("   Generate one: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"\n");
+  }
+  if (!env.encryptionMasterKey) {
+    log("⚠️  WARNING: ENCRYPTION_MASTER_KEY is not set — chat messages will be stored in PLAINTEXT.");
+    log("   Generate one: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"\n");
+  }
 
   await connectDatabase();
 
-  app.use("/auth",    cors(corsOptions), express.json(), instagramRouter);
-  app.use("/webhook", cors(corsOptions), express.json(), webhooksRouter);
+  app.use("/auth",    cors(corsOptions), authLimiter, express.json(), instagramRouter);
+  app.use("/webhook", express.json(), webhooksRouter); // no CORS — server-to-server from Meta; no rate limit — Meta sends bursts
   app.use("/events",  cors(corsOptions), sseRouter);
-  app.use("/ai",      cors(corsOptions), express.json(), aiStreamRouter);
+  app.use("/ai",      cors(corsOptions), apiLimiter, express.json(), aiStreamRouter);
   app.use("/ai/debug", cors(corsOptions), express.json(), aiDebugRouter);
+  app.use("/import",   cors(corsOptions), uploadLimiter, chatImportRouter); // multer handles its own body parsing
 
   const apolloServer = createApolloServer();
   await apolloServer.start();

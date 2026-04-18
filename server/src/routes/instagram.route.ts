@@ -12,6 +12,7 @@ import { PlatformConnection } from "../models/PlatformConnection.model";
 import { signToken } from "../services/jwt.service";
 import { env } from "../config/env";
 import { logError } from "../utils/logger";
+import { encryptAccessToken } from "../services/encryption.service";
 
 const router: express.Router = express.Router();
 
@@ -61,6 +62,7 @@ router.get("/instagram/callback", async (req: Request, res: Response): Promise<v
         const { data: igProfile } = await axios.get(`https://graph.facebook.com/v19.0/${igAccountId}`, {
           params: { fields: "id,username", access_token: accessToken },
         });
+        const encToken = encryptAccessToken(accessToken, user.id);
         await PlatformConnection.findOneAndUpdate(
           { userId: user.id, platform: "instagram_dm" },
           {
@@ -70,7 +72,7 @@ router.get("/instagram/callback", async (req: Request, res: Response): Promise<v
               igAccountId,
               igUserId:    igProfile.id,
               igUsername:  igProfile.username,
-              accessToken,
+              ...encToken,
               isActive:    true,
             },
           },

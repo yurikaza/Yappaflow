@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageCircle, Instagram, ArrowUpRight, Clock, Rocket, CheckCircle2,
-  Radio, Plus, TrendingUp, Pin, PinOff, Trash2, X, Loader2, Zap, BookUser,
+  Radio, Plus, TrendingUp, Pin, PinOff, Trash2, X, Loader2, Zap, BookUser, Upload, Send,
 } from "lucide-react";
+import ChatImport from "./ChatImport";
 import type { DashboardView } from "./DashboardShell";
 import {
   getSignals, getProjects, getDashboardStats, getPlatformConnections,
@@ -420,6 +421,7 @@ export function CommandCenter({ setView, setSignalId }: Props) {
   const [showAddSignal,        setShowAddSignal]        = useState(false);
   const [showAddProject,       setShowAddProject]       = useState(false);
   const [showStartConversation, setShowStartConversation] = useState(false);
+  const [showImport,           setShowImport]           = useState(false);
   const [liveFlash, setLiveFlash] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -592,23 +594,23 @@ export function CommandCenter({ setView, setSignalId }: Props) {
           ))}
         </div>
 
-        {/* Setup banner: logged in with WhatsApp but haven't connected Business API */}
-        {waLoginOnly && (
+        {/* Import banner: show when no conversations exist yet */}
+        {signals.length === 0 && !loading && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             className="mb-5 rounded-2xl border border-[#FF6B35]/20 bg-[#FF6B35]/5 p-5 flex items-center gap-4">
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-[#FF6B35]/10">
-              <MessageCircle size={22} className="text-[#FF6B35]" />
+              <Upload size={22} className="text-[#FF6B35]" />
             </div>
             <div className="flex-1">
-              <p className="text-[14px] font-bold text-white">Connect WhatsApp Business to receive messages</p>
+              <p className="text-[14px] font-bold text-white">Import your conversations</p>
               <p className="mt-0.5 text-[12px] text-white/40 leading-relaxed">
-                You signed in with your phone number, but to receive customer messages you need to connect your WhatsApp Business API.
+                Export chats from WhatsApp, Instagram, Telegram, or any messaging app and upload them here. All messages are encrypted at rest.
               </p>
             </div>
-            <button onClick={() => setView("integrations")}
+            <button onClick={() => setShowImport(true)}
               className="flex-shrink-0 flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2.5 text-[13px] font-bold text-white hover:opacity-90 transition-opacity">
-              <Zap size={13} />
-              Connect Now
+              <Upload size={13} />
+              Import Chats
             </button>
           </motion.div>
         )}
@@ -625,12 +627,18 @@ export function CommandCenter({ setView, setSignalId }: Props) {
                   </span>
                 )}
               </div>
-              {waConnected && (
-                <button onClick={() => setShowStartConversation(true)}
-                  className="flex items-center gap-1 rounded-lg border border-green-500/20 px-2.5 py-1 text-[11px] font-semibold text-[#25D366] bg-green-500/10 hover:bg-green-500/20 transition-colors">
-                  <MessageCircle size={11} />Start
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setShowImport(true)}
+                  className="flex items-center gap-1 rounded-lg border border-[#FF6B35]/20 px-2.5 py-1 text-[11px] font-semibold text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 transition-colors">
+                  <Upload size={11} />Import
                 </button>
-              )}
+                {waConnected && (
+                  <button onClick={() => setShowStartConversation(true)}
+                    className="flex items-center gap-1 rounded-lg border border-green-500/20 px-2.5 py-1 text-[11px] font-semibold text-[#25D366] bg-green-500/10 hover:bg-green-500/20 transition-colors">
+                    <MessageCircle size={11} />Start
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Connected platform badges */}
@@ -670,15 +678,16 @@ export function CommandCenter({ setView, setSignalId }: Props) {
                 ) : (
                   <>
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.04]">
-                      <MessageCircle size={18} className="text-white/20" />
+                      <Upload size={18} className="text-white/20" />
                     </div>
                     <p className="text-[13px] font-semibold text-white/30">No conversations yet</p>
-                    <p className="mt-1 text-[11px] text-white/20">
-                      Connect WhatsApp or Instagram in{" "}
-                      <button onClick={() => setView("integrations")} className="text-[#FF6B35] underline underline-offset-2">
-                        Settings → Platforms
-                      </button>
+                    <p className="mt-1 text-[11px] text-white/20 max-w-[180px]">
+                      Import chat exports from WhatsApp, Instagram, Telegram, or any messaging app
                     </p>
+                    <button onClick={() => setShowImport(true)}
+                      className="mt-4 flex items-center gap-1.5 rounded-xl bg-[#FF6B35] px-4 py-2 text-[12px] font-bold text-white hover:opacity-90 transition-opacity">
+                      <Upload size={13} />Import Chats
+                    </button>
                   </>
                 )}
               </div>
@@ -690,10 +699,16 @@ export function CommandCenter({ setView, setSignalId }: Props) {
                       className="group flex items-center gap-3 rounded-xl p-2 hover:bg-white/[0.04] transition-colors cursor-pointer"
                       onClick={() => { setSignalId(sig.id); setView("engine"); }}
                     >
-                      <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${sig.platform === "whatsapp" ? "bg-green-500/10" : "bg-pink-500/10"}`}>
-                        {sig.platform === "whatsapp"
-                          ? <MessageCircle size={14} className="text-green-500" />
-                          : <Instagram     size={14} className="text-pink-500" />}
+                      <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
+                        sig.platform === "whatsapp"  ? "bg-green-500/10" :
+                        sig.platform === "instagram" ? "bg-pink-500/10"  :
+                        sig.platform === "telegram"  ? "bg-blue-500/10"  :
+                                                       "bg-white/[0.06]"
+                      }`}>
+                        {sig.platform === "whatsapp"  ? <MessageCircle size={14} className="text-green-500" /> :
+                         sig.platform === "instagram" ? <Instagram     size={14} className="text-pink-500" /> :
+                         sig.platform === "telegram"  ? <Send          size={14} className="text-blue-400" /> :
+                                                        <MessageCircle size={14} className="text-white/30" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -836,6 +851,18 @@ export function CommandCenter({ setView, setSignalId }: Props) {
               setView("engine");
             }}
           />
+        )}
+        {showImport && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-md relative">
+              <button onClick={() => setShowImport(false)}
+                className="absolute -top-2 -right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[#0c0c0f] border border-white/[0.08] text-white/30 hover:text-white/60">
+                <X size={14} />
+              </button>
+              <ChatImport onImportComplete={() => { setTimeout(() => { setShowImport(false); load(); }, 2000); }} />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>

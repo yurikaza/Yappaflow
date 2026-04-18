@@ -10,6 +10,7 @@ import { Signal }            from "../models/Signal.model";
 import { ChatMessage }       from "../models/ChatMessage.model";
 import { PlatformConnection } from "../models/PlatformConnection.model";
 import { logError }          from "../utils/logger";
+import { decryptAccessToken } from "./encryption.service";
 
 export interface ImportResult {
   signalsCreated:  number;
@@ -38,6 +39,9 @@ export async function importInstagramConversations(
     return { signalsCreated: 0, messagesCreated: 0, platform: "instagram" };
   }
 
+  // Decrypt token for API calls (handles both encrypted and legacy plaintext)
+  const plainToken = decryptAccessToken(conn);
+
   let signalsCreated  = 0;
   let messagesCreated = 0;
 
@@ -49,7 +53,7 @@ export async function importInstagramConversations(
         params: {
           platform:      "instagram",
           fields:        "id,participants,messages{id,message,from,timestamp,attachments}",
-          access_token:  conn.accessToken,
+          access_token:  plainToken,
           limit:         100,
         },
       }

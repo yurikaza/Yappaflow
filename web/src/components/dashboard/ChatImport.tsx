@@ -1,0 +1,253 @@
+"use client";
+
+import { useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Upload, FileText, MessageCircle, Instagram, Send, X, Check, Loader2,
+  Shield, AlertCircle,
+} from "lucide-react";
+import { uploadChatFile, type ChatImportResult } from "@/lib/dashboard-api";
+
+const ACCEPTED_TYPES = ".txt,.json,.csv";
+
+const PLATFORM_INFO: Record<string, { icon: React.ReactNode; label: string; color: string; howTo: string }> = {
+  whatsapp: {
+    icon: <MessageCircle size={16} />,
+    label: "WhatsApp",
+    color: "#25D366",
+    howTo: "Open chat → ⋮ Menu → More → Export chat → Without media",
+  },
+  instagram: {
+    icon: <Instagram size={16} />,
+    label: "Instagram",
+    color: "#E1306C",
+    howTo: "Settings → Your activity → Download your information → Messages (JSON)",
+  },
+  telegram: {
+    icon: <Send size={16} />,
+    label: "Telegram",
+    color: "#0088CC",
+    howTo: "Desktop: Open chat → ⋮ Menu → Export chat history → JSON format",
+  },
+  csv: {
+    icon: <FileText size={16} />,
+    label: "CSV",
+    color: "#737373",
+    howTo: "CSV with columns: timestamp, sender, message",
+  },
+};
+
+interface Props {
+  onImportComplete?: (result: ChatImportResult) => void;
+}
+
+export default function ChatImport({ onImportComplete }: Props) {
+  const [file, setFile]           = useState<File | null>(null);
+  const [ownerName, setOwnerName] = useState("");
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState("");
+  const [result, setResult]       = useState<ChatImportResult | null>(null);
+  const [dragOver, setDragOver]   = useState(false);
+  const inputRef                  = useRef<HTMLInputElement>(null);
+
+  const handleFile = useCallback((f: File) => {
+    setFile(f);
+    setError("");
+    setResult(null);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  }, [handleFile]);
+
+  const handleSubmit = async () => {
+    if (!file) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await uploadChatFile(file, ownerName || undefined);
+      setResult(res);
+      onImportComplete?.(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Import failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reset = () => {
+    setFile(null);
+    setOwnerName("");
+    setError("");
+    setResult(null);
+  };
+
+  // ── Success state ──
+  if (result) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl border border-white/[0.05] bg-[#0c0c0f] p-6">
+        <div className="flex flex-col items-center text-center py-2">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+            <Check size={28} className="text-green-400" />
+          </div>
+          <h3 className="text-[15px] font-bold text-white">Import Complete</h3>
+          <p className="mt-2 text-[13px] text-white/40">
+            {result.messagesCreated} messages from {result.participants.length} contact{result.participants.length !== 1 ? "s" : ""}
+          </p>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+              style={{ background: `${PLATFORM_INFO[result.platform]?.color ?? "#737373"}15`, color: PLATFORM_INFO[result.platform]?.color ?? "#737373" }}>
+              {PLATFORM_INFO[result.platform]?.icon}
+              {PLATFORM_INFO[result.platform]?.label ?? result.platform}
+            </span>
+            {result.encrypted && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400">
+                <Shield size={10} /> Encrypted
+              </span>
+            )}
+          </div>
+          {result.participants.length > 0 && (
+            <div className="mt-4 w-full text-left">
+              <p className="text-[10px] font-semibold text-white/20 uppercase tracking-wide mb-1.5">Contacts imported</p>
+              <div className="flex flex-wrap gap-1.5">
+                {result.participants.slice(0, 10).map((p) => (
+                  <span key={p} className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[11px] text-white/40">{p}</span>
+                ))}
+                {result.participants.length > 10 && (
+                  <span className="text-[11px] text-white/20">+{result.participants.length - 10} more</span>
+                )}
+              </div>
+            </div>
+          )}
+          <button onClick={reset}
+            className="mt-5 rounded-lg bg-white/[0.05] px-4 py-2 text-[12px] font-medium text-white/50 hover:bg-white/[0.08] transition-colors">
+            Import another file
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ── Upload state ──
+  return (
+    <div className="rounded-2xl border border-white/[0.05] bg-[#0c0c0f] p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-[15px] font-bold text-white">Import Conversations</h3>
+        <div className="flex items-center gap-1 text-[10px] text-emerald-400/60">
+          <Shield size={10} />
+          <span>E2E encrypted</span>
+        </div>
+      </div>
+      <p className="text-[12px] text-white/30 mb-5 leading-relaxed">
+        Export your chats from WhatsApp, Instagram, Telegram, or any app — then upload here.
+        Messages are encrypted at rest.
+      </p>
+
+      {/* Platform quick-guide */}
+      <div className="grid grid-cols-2 gap-2 mb-5">
+        {Object.entries(PLATFORM_INFO).map(([key, info]) => (
+          <div key={key} className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-2.5">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span style={{ color: info.color }}>{info.icon}</span>
+              <span className="text-[11px] font-semibold text-white/60">{info.label}</span>
+            </div>
+            <p className="text-[10px] text-white/20 leading-snug">{info.howTo}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Drop zone */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+        className={`relative rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all ${
+          dragOver
+            ? "border-[#FF6B35]/40 bg-[#FF6B35]/5"
+            : file
+              ? "border-green-500/20 bg-green-500/5"
+              : "border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.02]"
+        }`}
+      >
+        <input ref={inputRef} type="file" accept={ACCEPTED_TYPES} className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+
+        <AnimatePresence mode="wait">
+          {file ? (
+            <motion.div key="file" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
+                <FileText size={18} className="text-green-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-[13px] font-medium text-white/80">{file.name}</p>
+                <p className="text-[11px] text-white/30">{(file.size / 1024).toFixed(1)} KB</p>
+              </div>
+              <button onClick={(e) => { e.stopPropagation(); reset(); }}
+                className="ml-2 text-white/20 hover:text-white/50">
+                <X size={14} />
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div key="empty" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+              <Upload size={24} className="mx-auto text-white/15 mb-2" />
+              <p className="text-[13px] text-white/40">
+                Drop your chat export here, or <span className="text-[#FF6B35]">browse</span>
+              </p>
+              <p className="text-[10px] text-white/15 mt-1">
+                Supports .txt, .json, .csv — max 25 MB
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Owner name (optional) */}
+      {file && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-4">
+          <label className="text-[11px] font-semibold text-white/30 uppercase tracking-wide mb-1.5 block">
+            Your name in the chat <span className="font-normal text-white/15">(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={ownerName}
+            onChange={(e) => setOwnerName(e.target.value)}
+            placeholder="e.g. Yuri, Agency Team"
+            className="w-full rounded-lg bg-white/[0.03] border border-white/[0.06] px-3 py-2.5 text-[13px] text-white placeholder:text-white/20 focus:outline-none focus:ring-1 focus:ring-[#FF6B35]/30"
+          />
+          <p className="mt-1 text-[10px] text-white/15">
+            Helps us mark your messages as outbound and client messages as inbound
+          </p>
+        </motion.div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="mt-3 flex items-start gap-2 rounded-lg bg-red-500/5 border border-red-500/10 px-3 py-2.5">
+          <AlertCircle size={14} className="text-red-400 mt-0.5 flex-shrink-0" />
+          <p className="text-[12px] text-red-400/80">{error}</p>
+        </div>
+      )}
+
+      {/* Submit */}
+      {file && (
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-[#FF6B35] py-3 text-[13px] font-semibold text-white hover:bg-[#FF6B35]/90 disabled:opacity-50 transition-all"
+        >
+          {loading ? (
+            <><Loader2 size={14} className="animate-spin" /> Importing...</>
+          ) : (
+            <><Upload size={14} /> Import Messages</>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}

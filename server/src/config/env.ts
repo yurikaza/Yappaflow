@@ -34,6 +34,10 @@ export const env = {
   metaAppSecret:    process.env.META_APP_SECRET  || process.env.INSTAGRAM_CLIENT_SECRET || "",
   whatsappConfigId: process.env.WHATSAPP_CONFIG_ID || "",
 
+  // Chat message encryption at rest (AES-256-GCM)
+  // Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  encryptionMasterKey: process.env.ENCRYPTION_MASTER_KEY || "",
+
   // Anthropic (Claude AI Engine)
   anthropicApiKey:    process.env.ANTHROPIC_API_KEY || "",
   anthropicModel:    process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514",

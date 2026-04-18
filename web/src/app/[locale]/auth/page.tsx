@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,10 +11,6 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
-  Loader2,
-  Check,
-  ChevronDown,
-  Zap,
 } from "lucide-react";
 import {
   loginWithEmail,
@@ -24,8 +20,6 @@ import {
   requestPhoneVerification,
   verifyPhone,
   getInstagramAuthUrl,
-  connectWhatsApp,
-  connectWhatsAppEmbedded,
 } from "@/lib/auth-api";
 
 type Step =
@@ -33,7 +27,6 @@ type Step =
   | "email"
   | "whatsapp_phone"
   | "whatsapp_otp"
-  | "whatsapp_connect"
   | "phone_verify"
   | "phone_otp";
 
@@ -47,11 +40,7 @@ export default function AuthPage() {
   const t = useTranslations("auth");
   const router = useRouter();
 
-  // If returning from Meta OAuth redirect, jump straight to whatsapp_connect step
-  const hasMetaCode = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("code");
-  const savedMetaToken = typeof window !== "undefined" ? sessionStorage.getItem("yappaflow_meta_token") ?? "" : "";
-
-  const [step, setStep] = useState<Step>(hasMetaCode && savedMetaToken ? "whatsapp_connect" : "choose");
+  const [step, setStep] = useState<Step>("choose");
   const [emailMode, setEmailMode] = useState<"login" | "register">("login");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,7 +52,7 @@ export default function AuthPage() {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
 
-  const [authToken, setAuthToken] = useState(savedMetaToken);
+  const [authToken, setAuthToken] = useState("");
   const [needsPhone, setNeedsPhone] = useState(false);
 
   function clearError() { setError(""); }
@@ -99,10 +88,7 @@ export default function AuthPage() {
     try {
       const data = await verifyWhatsappOtp(phone, otp);
       const result = data.verifyWhatsappOtp;
-      setAuthToken(result.token);
-      // After OTP: go to WhatsApp Business connect step instead of dashboard
-      localStorage.setItem("yappaflow_token", result.token);
-      setStep("whatsapp_connect");
+      storeTokenAndRedirect(result.token);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : t("errorInvalid")); }
     finally { setLoading(false); }
   }
@@ -286,14 +272,6 @@ export default function AuthPage() {
                 onResend={() => requestWhatsappOtp(phone)} t={t} />
             )}
 
-            {/* ── WHATSAPP BUSINESS CONNECT ── */}
-            {step === "whatsapp_connect" && (
-              <WhatsAppConnectStep
-                token={authToken}
-                onDone={() => router.push("/dashboard")}
-              />
-            )}
-
             {/* ── PHONE VERIFY ── */}
             {step === "phone_verify" && (
               <motion.div key="phone_verify" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className={cardCls}>
@@ -330,215 +308,6 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-// ── WhatsApp Business Connect Step (shown after OTP verification) ────────────
-
-function WhatsAppConnectStep({ token, onDone }: { token: string; onDone: () => void }) {
-  const [loading, setLoading]      = useState(false);
-  const [err, setErr]              = useState("");
-  const [connected, setConnected]  = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [manualToken, setManualToken] = useState("");
-  const [manualWabaId, setManualWabaId] = useState("");
-  const [showToken, setShowToken]  = useState(false);
-  const ready = true; // No FB SDK needed — we use redirect flow
-
-  // On mount: check if we're returning from Meta OAuth redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (!code) return;
-
-    // Clean the URL immediately (remove ?code=... from address bar)
-    window.history.replaceState({}, "", window.location.pathname);
-
-    const savedToken = sessionStorage.getItem("yappaflow_meta_token");
-    if (!savedToken) {
-      setErr("Session expired. Please try again.");
-      return;
-    }
-    sessionStorage.removeItem("yappaflow_meta_token");
-
-    // Exchange the code server-side
-    setLoading(true);
-    const redirectUri = `${window.location.origin}${window.location.pathname}`;
-    connectWhatsAppEmbedded({ code, redirectUri }, savedToken)
-      .then(() => {
-        setConnected(true);
-        setTimeout(onDone, 1500);
-      })
-      .catch((e: unknown) => {
-        setErr(e instanceof Error ? e.message : "Connection failed. Please try again.");
-      })
-      .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleContinueWithMeta = () => {
-    const appId = process.env.NEXT_PUBLIC_META_APP_ID;
-    const configId = process.env.NEXT_PUBLIC_WHATSAPP_CONFIG_ID;
-    if (!appId || !configId) {
-      setErr("Meta integration is being set up. Please use the developer option below.");
-      setShowAdvanced(true);
-      return;
-    }
-
-    // Save auth token so we can retrieve it after redirect
-    sessionStorage.setItem("yappaflow_meta_token", token);
-
-    // Redirect to Facebook OAuth with Embedded Signup config
-    const redirectUri = encodeURIComponent(`${window.location.origin}${window.location.pathname}`);
-    window.location.href =
-      `https://www.facebook.com/v21.0/dialog/oauth` +
-      `?client_id=${appId}` +
-      `&config_id=${configId}` +
-      `&response_type=code` +
-      `&override_default_response_type=true` +
-      `&redirect_uri=${redirectUri}`;
-  };
-
-  const handleManualConnect = async () => {
-    if (!manualToken) { setErr("Please paste your access token"); return; }
-    setLoading(true); setErr("");
-    try {
-      await connectWhatsApp({ accessToken: manualToken, ...(manualWabaId ? { wabaId: manualWabaId } : {}) }, token);
-      setConnected(true);
-      setTimeout(onDone, 1500);
-    } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : "Connection failed — check the token");
-    } finally { setLoading(false); }
-  };
-
-  // ── Success state ──
-  if (connected) {
-    return (
-      <motion.div key="wa_connect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0c0c0f] border border-white/[0.06] rounded-xl p-8">
-        <div className="flex flex-col items-center text-center py-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366]/10 border-2 border-[#25D366]/30 mb-4">
-            <Check size={32} className="text-[#25D366]" />
-          </div>
-          <h2 className="text-xl font-bold text-white">You&apos;re all set!</h2>
-          <p className="mt-2 text-sm text-white/30">WhatsApp Business connected. Redirecting to your dashboard...</p>
-        </div>
-      </motion.div>
-    );
-  }
-
-  // ── Connect state ──
-  return (
-    <motion.div key="wa_connect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-      className="bg-[#0c0c0f] border border-white/[0.06] rounded-xl p-8">
-
-      {/* Step indicator */}
-      <div className="flex items-center gap-2 mb-6">
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#25D366] text-white text-[11px] font-bold">2</div>
-        <span className="text-[11px] font-semibold text-white/30 uppercase tracking-wide">Last step</span>
-      </div>
-
-      <h2 className="text-xl font-bold text-white">Connect WhatsApp Business</h2>
-      <p className="mt-2 text-sm text-white/30 leading-relaxed">
-        Allow Yappaflow to receive messages from your WhatsApp Business account.
-        You&apos;ll be redirected to Meta to select your business and confirm.
-      </p>
-
-      {/* What happens */}
-      <div className="mt-5 space-y-2">
-        {[
-          "Meta will ask you to grant Yappaflow permission",
-          "Select your WhatsApp Business account & phone number",
-          "Customer messages will appear in your dashboard instantly",
-        ].map((text, i) => (
-          <div key={i} className="flex items-start gap-2.5">
-            <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#25D366]/10 mt-0.5">
-              <Check size={10} className="text-[#25D366]" />
-            </div>
-            <p className="text-[12px] text-white/40">{text}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Info notice */}
-      <div className="mt-5 rounded-lg bg-amber-500/5 border border-amber-500/10 px-4 py-3">
-        <p className="text-[11px] text-amber-400/60">
-          You&apos;ll be redirected to Facebook to authorize. After confirming, you&apos;ll return here automatically.
-        </p>
-      </div>
-
-      {/* Primary CTA: Continue with Meta */}
-      <button
-        onClick={handleContinueWithMeta}
-        disabled={loading || !ready}
-        className="mt-4 w-full flex items-center justify-center gap-3 rounded-lg py-3.5 font-semibold text-white transition-all hover:opacity-90 disabled:opacity-50 text-sm"
-        style={{ background: "linear-gradient(135deg, #0078FF, #00C6FF)" }}
-      >
-        {loading ? (
-          <><Loader2 size={16} className="animate-spin" /> Connecting to Meta...</>
-        ) : (
-          <>
-            {/* Meta logo */}
-            <svg width="20" height="20" viewBox="0 0 36 36" fill="currentColor">
-              <path d="M18 2.1C9.2 2.1 2.1 9.2 2.1 18c0 4.9 2.2 9.3 5.7 12.2V36l5.6-3.1c1.5.4 3 .6 4.6.6 8.8 0 15.9-7.1 15.9-15.9S26.8 2.1 18 2.1z"/>
-            </svg>
-            Continue with Meta
-          </>
-        )}
-      </button>
-
-      {err && <p className="mt-3 text-sm text-red-400 text-center">{err}</p>}
-
-      {/* Developer fallback — hidden by default */}
-      <div className="mt-4">
-        <button
-          onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-1 text-[10px] text-white/15 hover:text-white/25 transition-colors mx-auto"
-        >
-          <ChevronDown size={9} className={`transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
-          Developer options
-        </button>
-        {showAdvanced && (
-          <div className="mt-3 space-y-2 rounded-lg border border-white/[0.05] bg-white/[0.02] p-3">
-            <div className="flex items-center gap-2 rounded-lg border border-white/[0.05] bg-[#111114] px-3">
-              <input
-                type={showToken ? "text" : "password"}
-                value={manualToken}
-                onChange={(e) => setManualToken(e.target.value)}
-                placeholder="System User Access Token"
-                className="flex-1 bg-transparent py-2 text-[11px] font-mono text-white outline-none"
-                autoComplete="off"
-              />
-              <button onClick={() => setShowToken((v) => !v)} className="text-white/15 hover:text-white/30">
-                {showToken ? <EyeOff size={11} /> : <Eye size={11} />}
-              </button>
-            </div>
-            <div className="rounded-lg border border-white/[0.05] bg-[#111114] px-3">
-              <input
-                type="text"
-                value={manualWabaId}
-                onChange={(e) => setManualWabaId(e.target.value)}
-                placeholder="WABA ID (from Meta Business Settings)"
-                className="w-full bg-transparent py-2 text-[11px] font-mono text-white outline-none"
-                autoComplete="off"
-              />
-            </div>
-            <button onClick={handleManualConnect} disabled={loading}
-              className="w-full rounded-lg bg-white/[0.06] py-2 text-[11px] font-semibold text-white/40 hover:bg-white/[0.08] disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5">
-              {loading && <Loader2 size={11} className="animate-spin" />}
-              Connect with token
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Skip */}
-      <button
-        onClick={onDone}
-        className="mt-4 w-full text-center text-[12px] text-white/15 hover:text-white/30 transition-colors"
-      >
-        Skip for now
-      </button>
-    </motion.div>
   );
 }
 
